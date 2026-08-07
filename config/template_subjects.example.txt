@@ -1,0 +1,18 @@
+# Subjects that go into the second-pass surface registration template.
+# One "<subject>/<scan>" per line. Blank lines and # comments are ignored.
+#
+# Copy this to config/template_subjects.txt and fill in your own cohort.
+# config/template_subjects.txt is git-ignored: a list of the exact subjects and
+# sessions you used is derived from your dataset, and most Data Use Agreements
+# (ADNI's included) do not let you republish it.
+#
+# Practical notes:
+#   - a few hundred subjects is plenty; more mostly costs runtime
+#   - every listed subject must already have <hemi>.sphere.reg0 at every level,
+#     i.e. it must have been through bin/04_surfreg_pass1.sh
+#   - drop any subject whose pass-1 registration failed, or the template will
+#     inherit the failure
+
+SUBJ0001/0
+SUBJ0002/0
+SUBJ0003/1

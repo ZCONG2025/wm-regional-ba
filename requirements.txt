@@ -1,0 +1,13 @@
+# Pinned to major versions that were verified to work together.
+# Loosen these only if you re-check that mne.write_surface still emits the
+# FreeSurfer binary surface format the pipeline expects.
+numpy>=1.24,<2.0
+scipy>=1.10
+nibabel>=5.0
+mne>=1.5
+scikit-image>=0.21
+trimesh>=4.0
+torch>=2.0
+
+# tools/dicom_to_nifti.py only
+SimpleITK>=2.3

@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: "WM-RegionalBA: Laplacian white-matter mid-surfaces for regional white-matter brain age"
+message: "If you use this software, please cite both the software and the paper below."
+type: software
+authors:
+  - family-names: Zang
+    given-names: Cong
+    # orcid: "https://orcid.org/0000-0000-0000-0000"   # TODO
+    affiliation: "University of Southern California"
+repository-code: "https://github.com/OWNER/wm-regional-ba"   # TODO
+license: MIT
+version: "1.0.0"
+keywords:
+  - neuroimaging
+  - white matter
+  - brain age
+  - FLAIR
+  - FreeSurfer
+  - surface registration
+
+# TODO: fill in once the paper is out, then delete this comment.
+# preferred-citation:
+#   type: article
+#   authors:
+#     - family-names: Zang
+#       given-names: Cong
+#   title: ""
+#   journal: ""
+#   year: 2026
+#   doi: ""

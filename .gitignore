@@ -1,0 +1,58 @@
+# ---------------------------------------------------------------------------
+# HUMAN SUBJECT DATA -- never commit any of this.
+# ADNI, PPMI and most other consortia forbid redistributing subject-level data
+# under their Data Use Agreement. That includes clinical tables, subject ID
+# lists, scan dates and demographics, not just the images.
+# ---------------------------------------------------------------------------
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.mat
+*.nii
+*.nii.gz
+*.mgz
+*.mgh
+*.dcm
+*.obj
+*.tif
+*.arr
+srcs/
+data/
+work/
+logs/
+subjects*.txt
+*_id*.txt
+*_ids*.txt
+config/template_subjects.txt
+
+# site-specific configuration
+config/config.sh
+cluster/queue.conf
+
+# licences that must not be redistributed
+license.txt
+.license
+freesurfer_license*
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# matlab
+*.asv
+*.mex*
+pathdef.m
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

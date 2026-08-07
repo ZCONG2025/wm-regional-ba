@@ -1,0 +1,22 @@
+# This repository runs on Linux. CRLF line endings break shell shebangs
+# ("bad interpreter: /usr/bin/env bash^M"), so force LF for everything textual,
+# regardless of the platform it is edited or checked out on.
+*       text=auto eol=lf
+
+*.sh    text eol=lf
+*.arr   text eol=lf
+*.py    text eol=lf
+*.m     text eol=lf
+*.yml   text eol=lf
+*.toml  text eol=lf
+*.cff   text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+Dockerfile text eol=lf
+
+# never mangle binary data
+*.nii   binary
+*.gz    binary
+*.mgz   binary
+*.mat   binary
+*.tif   binary

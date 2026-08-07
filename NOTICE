@@ -1,0 +1,42 @@
+WM-RegionalBA
+Copyright (c) 2024-2026 Cong Zang
+
+This product includes software developed by third parties.
+
+--------------------------------------------------------------------------------
+Vox2Cortex
+https://github.com/ai-med/Vox2Cortex
+
+The following functions in wmba/mesh_utils.py are adapted from Vox2Cortex:
+
+    normalize_vertices_per_max_dim
+    unnormalize_vertices_per_max_dim
+    normalize_vertices_flip
+    voxelize_mesh_trimesh
+    get_occupied_voxels_trimesh
+    aggregate_trilinear
+    aggregate_from_indices
+
+ACTION REQUIRED BEFORE PUBLISHING: confirm the licence Vox2Cortex is released
+under and that it is compatible with the licence chosen for this repository.
+If it is copyleft or non-commercial, that constrains what this repository may be
+licensed as. Reproduce the upstream licence text here.
+
+--------------------------------------------------------------------------------
+Laplace solver
+
+The Jacobi relaxation scheme in wmba/laplacian.py follows the approach shown in
+Luke Polson's "Python Metaphysics Series", video 31:
+https://github.com/lukepolson/youtube_channel
+
+--------------------------------------------------------------------------------
+External tools invoked but not distributed
+
+  FreeSurfer   https://surfer.nmr.mgh.harvard.edu/     (own licence required)
+  FSL          https://fsl.fmrib.ox.ac.uk/fsl/         (own licence required)
+  MATLAB       https://www.mathworks.com/              (own licence required)
+  SurfStat     https://math.mcgill.ca/keith/surfstat/
+  SynthSeg     https://github.com/BBillot/SynthSeg     (optional)
+
+The two-pass surface template procedure follows FreeSurfer's documented recipe:
+https://surfer.nmr.mgh.harvard.edu/fswiki/SurfaceRegAndTemplates
