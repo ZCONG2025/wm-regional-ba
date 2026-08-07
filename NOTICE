@@ -6,21 +6,31 @@ This product includes software developed by third parties.
 --------------------------------------------------------------------------------
 Vox2Cortex
 https://github.com/ai-med/Vox2Cortex
+Copyright (c) Fabi Bongratz and contributors
+Licensed under the GNU General Public License v3.0
 
-The following functions in wmba/mesh_utils.py are adapted from Vox2Cortex:
+wmba/mesh_utils.py contains code adapted from Vox2Cortex:
 
-    normalize_vertices_per_max_dim
-    unnormalize_vertices_per_max_dim
-    normalize_vertices_flip
-    voxelize_mesh_trimesh
-    get_occupied_voxels_trimesh
-    aggregate_trilinear
-    aggregate_from_indices
+    normalize_vertices_per_max_dim      from vox2organ/utils/coordinate_transform.py
+    unnormalize_vertices_per_max_dim    from vox2organ/utils/coordinate_transform.py
+    aggregate_trilinear                 from vox2organ/utils/feature_aggregation.py
+    aggregate_from_indices              from vox2organ/utils/feature_aggregation.py
 
-ACTION REQUIRED BEFORE PUBLISHING: confirm the licence Vox2Cortex is released
-under and that it is compatible with the licence chosen for this repository.
-If it is copyleft or non-commercial, that constrains what this repository may be
-licensed as. Reproduce the upstream licence text here.
+Modifications made here: shared assertion logic factored into a helper;
+`aggregate_from_indices` now honours its `mode` argument (upstream and the
+earlier version of this code silently forced bilinear interpolation);
+`aggregate_trilinear` raises on an empty selection rather than failing inside
+torch.cat.
+
+get_occupied_voxels_trimesh implements the same idea as Vox2Cortex's
+Mesh.get_occupied_voxels, though not by copying it; voxelize_mesh_trimesh and
+normalize_vertices_flip have no upstream counterpart.
+
+BECAUSE Vox2Cortex IS GPL-3.0, THIS REPOSITORY IS ALSO GPL-3.0. That is a
+requirement of the upstream licence, not a preference. Removing the four
+functions listed above -- by reimplementing them without reference to
+Vox2Cortex -- is the only route to a more permissive licence, and it is not a
+decision to take without advice.
 
 --------------------------------------------------------------------------------
 Laplace solver

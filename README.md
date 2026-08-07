@@ -184,7 +184,15 @@ If this pipeline contributes to work you publish, please cite it — see
 
 ## Licence
 
-MIT — see [`LICENSE`](LICENSE). This covers the code in this repository only;
-FreeSurfer, FSL, MATLAB, SurfStat and SynthSeg each carry their own licence and
-must be obtained separately. Third-party code incorporated here is credited in
-[`NOTICE`](NOTICE).
+**GPL-3.0-only** — see [`LICENSE`](LICENSE). You may use, modify and
+redistribute this code, but anything you distribute that builds on it must also
+be released under the GPL-3.0.
+
+This is inherited, not chosen: `wmba/mesh_utils.py` adapts coordinate-transform
+and feature-aggregation code from [Vox2Cortex](https://github.com/ai-med/Vox2Cortex),
+which is GPL-3.0. [`NOTICE`](NOTICE) lists exactly which functions and how they
+were modified.
+
+The licence covers the code in this repository only. FreeSurfer, FSL, MATLAB,
+SurfStat and SynthSeg each carry their own licence and must be obtained
+separately.

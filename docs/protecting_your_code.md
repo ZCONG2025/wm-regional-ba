@@ -49,6 +49,19 @@ Talk to your university's tech transfer office before choosing anything
 non-standard — if the work was funded by a grant, the licence may not be
 entirely yours to pick.
 
+**This repository is GPL-3.0, and that was not a free choice.**
+`wmba/mesh_utils.py` adapts four functions from
+[Vox2Cortex](https://github.com/ai-med/Vox2Cortex), which is GPL-3.0; copyleft
+propagates to the whole work. The only route to a more permissive licence would
+be to reimplement those functions without reference to the original, and then
+argue that the reimplementation is genuinely independent — a judgement call, not
+a mechanical one. `NOTICE` records exactly what came from where.
+
+The general lesson is worth keeping: **check the licence of anything you copy
+into a repository at the moment you copy it, not at the moment you publish.** A
+single borrowed helper function determines what the whole project may be
+licensed as.
+
 **4. Keep the git history clean.** `git log` reveals directory structures,
 collaborator names and dataset paths. Publish from a fresh repository with a
 single initial commit rather than pushing your working history. This repository
@@ -61,9 +74,9 @@ is a fresh directory, so an `git init` here gives you exactly that.
 - [ ] no `license.txt` for FreeSurfer or any other tool
 - [ ] no absolute paths naming colleagues: `grep -rn "/ifs/\|/ifshome/\|/scratch/" .`
 - [ ] no cluster hostnames or internal URLs
-- [ ] `LICENSE` says what you actually mean
+- [ ] `LICENSE` says what you actually mean — and is compatible with everything in `NOTICE`
 - [ ] `CITATION.cff` has the right author list, ORCID and paper reference
-- [ ] the third-party attribution in `NOTICE` is accurate and compatible with your licence choice
+- [ ] any code added since the last release has had its provenance and licence checked
 
 Run the whole check at once:
 

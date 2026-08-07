@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Laplacian white-matter mid-surfaces and FLAIR sampling for regional white-matter brain age"
 readme = "README.md"
 requires-python = ">=3.9"
-license = "MIT"
+license = "GPL-3.0-only"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Cong Zang" }]
 keywords = ["neuroimaging", "white matter", "FreeSurfer", "brain age", "FLAIR"]

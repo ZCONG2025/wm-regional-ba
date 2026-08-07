@@ -1,7 +1,15 @@
 """Mesh <-> voxel coordinate helpers.
 
-The normalisation and feature-aggregation helpers are adapted from Vox2Cortex
-(https://github.com/ai-med/Vox2Cortex). See NOTICE for attribution.
+Copyright (c) 2024-2026 Cong Zang
+Portions copyright (c) Fabi Bongratz and contributors, from Vox2Cortex
+(https://github.com/ai-med/Vox2Cortex), used and modified under the GPL-3.0.
+
+This file is part of WM-RegionalBA and is licensed under the GNU General Public
+License v3.0. See the LICENSE file at the repository root. The specific
+functions adapted from Vox2Cortex, and how they were modified, are listed in
+NOTICE.
+
+SPDX-License-Identifier: GPL-3.0-only
 
 Coordinate conventions
 ----------------------

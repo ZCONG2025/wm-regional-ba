@@ -8,7 +8,7 @@ authors:
     # orcid: "https://orcid.org/0000-0000-0000-0000"   # TODO
     affiliation: "University of Southern California"
 repository-code: "https://github.com/ZCONG2025/wm-regional-ba"
-license: MIT
+license: GPL-3.0-only
 version: "1.0.0"
 keywords:
   - neuroimaging
