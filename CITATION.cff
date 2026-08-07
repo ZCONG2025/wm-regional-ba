@@ -7,7 +7,7 @@ authors:
     given-names: Cong
     # orcid: "https://orcid.org/0000-0000-0000-0000"   # TODO
     affiliation: "University of Southern California"
-repository-code: "https://github.com/OWNER/wm-regional-ba"   # TODO
+repository-code: "https://github.com/ZCONG2025/wm-regional-ba"
 license: MIT
 version: "1.0.0"
 keywords:

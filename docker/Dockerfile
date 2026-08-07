@@ -26,7 +26,7 @@ FROM python:3.11-slim-bookworm
 
 LABEL org.opencontainers.image.title="WM-RegionalBA" \
       org.opencontainers.image.description="Laplacian white-matter mid-surfaces and FLAIR sampling" \
-      org.opencontainers.image.source="https://github.com/OWNER/wm-regional-ba" \
+      org.opencontainers.image.source="https://github.com/ZCONG2025/wm-regional-ba" \
       org.opencontainers.image.licenses="SEE LICENSE IN LICENSE"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

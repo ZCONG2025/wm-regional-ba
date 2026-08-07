@@ -33,7 +33,7 @@ FreeSurfer needs a licence file (free, academic). Get one at
 ## Install
 
 ```bash
-git clone https://github.com/OWNER/wm-regional-ba.git
+git clone https://github.com/ZCONG2025/wm-regional-ba.git
 cd wm-regional-ba
 
 conda env create -f environment.yml && conda activate wmba
