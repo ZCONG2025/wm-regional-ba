@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Zang
     given-names: Cong
-    # orcid: "https://orcid.org/0000-0000-0000-0000"   # TODO
+    orcid: "https://orcid.org/0009-0008-9545-211X"
     affiliation: "University of Southern California"
 repository-code: "https://github.com/ZCONG2025/wm-regional-ba"
 license: GPL-3.0-only
