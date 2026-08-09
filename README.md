@@ -165,6 +165,7 @@ in [`docs/pipeline.md`](docs/pipeline.md).
 | | |
 |---|---|
 | [`docs/pipeline.md`](docs/pipeline.md) | what each stage does, how to build a template, output format |
+| [`docs/references.md`](docs/references.md) | what to cite in a methods section, with BibTeX |
 | [`docs/known_issues.md`](docs/known_issues.md) | **read before trusting the output** — behaviour that differs from what the code appears to intend |
 | [`docs/docker.md`](docs/docker.md) | containerised Python stages, and why the full pipeline cannot be one image |
 | [`docs/FILE_MAP.md`](docs/FILE_MAP.md) | how this repository maps onto the original research scripts |
@@ -181,6 +182,11 @@ relevant file types so they cannot be committed by accident.
 
 If this pipeline contributes to work you publish, please cite it — see
 [`CITATION.cff`](CITATION.cff) (GitHub renders a "Cite this repository" button).
+
+A methods section should also credit the work this is built on:
+[Jones et al. 2000](docs/references.md) for the Laplace construction,
+FreeSurfer for the surface registration, and Vox2Cortex for the mesh utilities.
+[`docs/references.md`](docs/references.md) lists all of them, with BibTeX.
 
 ## Licence
 

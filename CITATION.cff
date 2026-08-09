@@ -28,3 +28,87 @@ keywords:
 #   journal: ""
 #   year: 2026
 #   doi: ""
+
+# The work this pipeline is built on. Software dependencies are listed with the
+# full set of references, and BibTeX, in docs/references.md.
+references:
+  - type: article
+    authors:
+      - family-names: Jones
+        given-names: Stephen E.
+      - family-names: Buchbinder
+        given-names: Bradley R.
+      - family-names: Aharon
+        given-names: Itzhak
+    title: "Three-dimensional mapping of cortical thickness using Laplace's equation"
+    journal: "Human Brain Mapping"
+    volume: 11
+    issue: 1
+    start: 12
+    end: 32
+    year: 2000
+    notes: "The iso-potential surface construction this pipeline applies to white matter."
+
+  - type: article
+    authors:
+      - family-names: Lorensen
+        given-names: William E.
+      - family-names: Cline
+        given-names: Harvey E.
+    title: "Marching cubes: A high resolution 3D surface construction algorithm"
+    journal: "ACM SIGGRAPH Computer Graphics"
+    volume: 21
+    issue: 4
+    start: 163
+    end: 169
+    year: 1987
+    doi: "10.1145/37402.37422"
+
+  - type: article
+    authors:
+      - family-names: Fischl
+        given-names: Bruce
+      - family-names: Sereno
+        given-names: Martin I.
+      - family-names: Tootell
+        given-names: Roger B. H.
+      - family-names: Dale
+        given-names: Anders M.
+    title: "High-resolution intersubject averaging and a coordinate system for the cortical surface"
+    journal: "Human Brain Mapping"
+    volume: 8
+    issue: 4
+    start: 272
+    end: 284
+    year: 1999
+    notes: "The spherical registration and template procedure used in stages 03-06."
+
+  - type: conference-paper
+    authors:
+      - family-names: Bongratz
+        given-names: Fabian
+      - family-names: Rickmann
+        given-names: Anne-Marie
+      - family-names: Pölsterl
+        given-names: Sebastian
+      - family-names: Wachinger
+        given-names: Christian
+    title: "Vox2Cortex: Fast Explicit Reconstruction of Cortical Surfaces From 3D MRI Scans With Geometric Deep Neural Networks"
+    collection-title: "Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+    start: 20773
+    end: 20783
+    year: 2022
+    notes: "wmba/mesh_utils.py adapts its coordinate-transform and feature-aggregation utilities; see NOTICE."
+
+  - type: article
+    authors:
+      - family-names: Fischl
+        given-names: Bruce
+    title: "FreeSurfer"
+    journal: "NeuroImage"
+    volume: 62
+    issue: 2
+    start: 774
+    end: 781
+    year: 2012
+    doi: "10.1016/j.neuroimage.2012.01.021"

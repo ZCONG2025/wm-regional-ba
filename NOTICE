@@ -9,6 +9,11 @@ https://github.com/ai-med/Vox2Cortex
 Copyright (c) Fabi Bongratz and contributors
 Licensed under the GNU General Public License v3.0
 
+  Bongratz F, Rickmann A-M, Poelsterl S, Wachinger C. Vox2Cortex: Fast explicit
+  reconstruction of cortical surfaces from 3D MRI scans with geometric deep
+  neural networks. Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition (CVPR). 2022:20773-20783.
+
 wmba/mesh_utils.py contains code adapted from Vox2Cortex:
 
     normalize_vertices_per_max_dim      from vox2organ/utils/coordinate_transform.py
