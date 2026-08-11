@@ -40,8 +40,19 @@ export WMBA_TEMPLATE_SEED="${WMBA_TEMPLATE_SEED:-SUBJECT_ID/0}"
 export WMBA_TEMPLATE_SUBJECTS="${WMBA_TEMPLATE_SUBJECTS:-$WMBA_ROOT/config/template_subjects.txt}"
 
 # --- external neuroimaging software ---------------------------------------
+# Developed against FreeSurfer 7.1.0. Surface outputs are not identical across
+# FreeSurfer major versions, so record whichever you use in your methods.
 export FREESURFER_HOME="${FREESURFER_HOME:-/usr/local/freesurfer-7.1.0}"
+
+# FreeSurfer needs a licence file (free, academic):
+#   https://surfer.nmr.mgh.harvard.edu/registration.html
+# Leave this unset if the file already sits at $FREESURFER_HOME/license.txt;
+# set it if your licence lives elsewhere (e.g. a read-only shared install).
+# export FS_LICENSE="/path/to/license.txt"
+
 export FSLDIR="${FSLDIR:-/usr/local/fsl}"
+# NIFTI_GZ is assumed throughout; the pipeline writes and expects .nii.gz.
+export FSLOUTPUTTYPE="${FSLOUTPUTTYPE:-NIFTI_GZ}"
 
 # Python interpreter that has the packages in requirements.txt installed.
 # e.g. /path/to/conda/envs/wmba/bin/python

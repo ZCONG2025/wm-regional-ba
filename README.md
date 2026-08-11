@@ -41,10 +41,81 @@ conda env create -f environment.yml && conda activate wmba
 
 cp config/config.example.sh config/config.sh
 $EDITOR config/config.sh          # point it at FreeSurfer, FSL, MATLAB, your data
+
+bin/check_config.sh               # verify it before running anything
 ```
 
-`config/config.sh` is git-ignored, so your paths stay on your machine. Every
-setting can also be overridden by exporting the variable before running.
+## Configuration
+
+**There are no paths in the code.** Every location the pipeline touches comes
+from one file, `config/config.sh`, which you create from
+[`config/config.example.sh`](config/config.example.sh) and edit. It is
+git-ignored, so your paths never leave your machine.
+
+Three things read it, so you only ever set a path once:
+
+- **Shell stages** — every script in `bin/` sources `bin/lib/common.sh`, which
+  sources your config. You never pass a path on the command line.
+- **Python stages** — each takes `--data-dir`, defaulting to `$WMBA_DATA_DIR`.
+- **MATLAB stages** — read `WMBA_ICO_DIR`, `WMBA_SURF2ICO` and `WMBA_ICO_ORDER`
+  from the environment; `MATLABPATH` is assembled from `$WMBA_MATLAB_MODULES`.
+
+Every setting is written `${VAR:-default}`, so exporting a variable beforehand
+overrides the file without editing it — useful for one-off runs and for cluster
+jobs:
+
+```bash
+WMBA_DATA_DIR=/scratch/$USER/wmba bin/run_subject.sh SUBJ01 ...
+```
+
+### What you must set
+
+| | |
+|---|---|
+| `FREESURFER_HOME` | your FreeSurfer install |
+| `FSLDIR` | your FSL install |
+| `WMBA_PYTHON` | interpreter with `requirements.txt` installed (e.g. `.../envs/wmba/bin/python`) |
+| `WMBA_MATLAB`, `WMBA_MATLAB_MODULES` | MATLAB binary, and the directory holding SurfStat + the FreeSurfer MATLAB helpers |
+| `WMBA_ICO_DIR`, `WMBA_SURF2ICO` | directory with `ic<order>.tri`, and the `mri_surf2ico.sh` wrapper |
+| `WMBA_T1_DIR`, `WMBA_FLAIR_DIR` | where your input NIfTIs live |
+| `WMBA_DATA_DIR`, `WMBA_TEMPLATE_DIR`, `WMBA_TMP_DIR`, `WMBA_FS_DIR` | outputs; default to `work/` inside the repo, move them to fast scratch for real cohorts |
+
+Optional and safely left empty: `WMBA_WMHSEG_*` (stage 08) and
+`WMBA_SYNTHSEG_*` (stage 09). Cluster settings live separately in
+`cluster/queue.conf` (see `cluster/queue.conf.example`).
+
+### FreeSurfer specifically
+
+Set `FREESURFER_HOME` and nothing else — the pipeline sources
+`$FREESURFER_HOME/SetUpFreeSurfer.sh` itself and manages `SUBJECTS_DIR` per
+stage, so you do not need FreeSurfer already active in your shell.
+
+The **licence file is yours to obtain**; it is deliberately not in this
+repository. Register (free, academic) at
+<https://surfer.nmr.mgh.harvard.edu/registration.html> and either drop
+`license.txt` into `$FREESURFER_HOME`, or set `FS_LICENSE` to wherever you keep
+it — useful when FreeSurfer is a read-only shared install:
+
+```bash
+export FS_LICENSE=$HOME/.freesurfer/license.txt
+```
+
+`bin/check_config.sh` verifies the licence is found, sources the environment,
+and confirms each FreeSurfer tool the pipeline calls is on `PATH`. It also
+prints your FreeSurfer version — **record it in your methods**, because surface
+outputs are not identical across major versions. This pipeline was developed
+against 7.1.0.
+
+### Checking the configuration
+
+```bash
+bin/check_config.sh
+```
+
+Reports `OK` / `SKIP` / `FAIL` per item, with the fix in each failure message,
+and exits non-zero if the core pipeline cannot run. `SKIP` covers optional
+stages and a template you have not built yet. Run it before submitting a
+cohort — it costs a second and saves a day of cluster time.
 
 ## Run
 
