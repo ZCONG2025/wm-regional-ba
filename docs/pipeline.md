@@ -92,32 +92,113 @@ cluster/submit_array.sh jobs/cohort.arr 300 50
 `subjects.tsv` is `<subject> <t1_image_id> <flair_image_id> [scan]`, one per
 line. Parallelise across subjects only — see `docs/known_issues.md` §3.
 
-### Building a template from scratch
+## Obtaining a template
+
+A template is a set of `<hemi>lvl<level>_1.tif` files in `$WMBA_TEMPLATE_DIR` —
+16 of them for the default 2 hemispheres × 8 levels. Every subject is registered
+to it, and that registration is what makes vertex *i* mean the same location
+across subjects. **Nothing downstream works without one.**
+
+They are not in this repository: they are large binaries, and `.gitignore`
+blocks `*.tif` on purpose. Distribute or obtain them as a release asset or a
+Zenodo archive, then:
 
 ```bash
-# 1. every candidate subject through stage 02 first
-for s in $(cut -f1 template_cohort.tsv); do
-  bin/02_make_isosurf.sh "$s" 0 lh 1   # ... and every level/hemi
-done
+bin/install_template.sh /path/to/template_dir     # or template.tar.gz / .zip
+bin/check_config.sh                               # confirms all 16 are present
+```
 
-# 2. seed
+`install_template.sh` verifies the whole set before copying anything, so an
+incomplete template fails immediately rather than three hours into a run. It also
+installs the first-pass `<hemi>lvl<level>.tif` files if the source has them —
+those are only needed if you intend to extend the template cohort later.
+
+If you only have `_1.tif` files, that is enough to process subjects.
+
+## Building a template
+
+Only needed if no suitable template exists for your work. This follows
+FreeSurfer's documented two-pass recipe
+(<https://surfer.nmr.mgh.harvard.edu/fswiki/SurfaceRegAndTemplates>).
+
+### Why two passes
+
+A template is the average folding pattern of a cohort in spherical coordinates.
+To average a cohort you must first align it — but aligning requires a template.
+The two passes break that circularity:
+
+1. **Seed.** Build a template from a *single* subject. It is arbitrary and
+   biased toward that one anatomy, but it gives every other subject something to
+   register to.
+2. **Rebuild.** Register the whole cohort to the seed template, then rebuild the
+   template from all of those registrations. The result is an average, and the
+   individual seed's idiosyncrasies wash out.
+
+Only the second-pass templates (`_1.tif`) are used to process subjects. The
+first-pass ones exist solely to bootstrap the second.
+
+Do not iterate further: a third pass buys almost nothing and the FreeSurfer
+recipe does not call for one.
+
+### What the original study used
+
+For the reference implementation the seed was one arbitrarily chosen subject,
+excluded from the second-pass cohort. The second pass then used **399**
+subjects — 400 were selected, and one was dropped because its first-pass
+registration failed. That attrition is normal; see
+[`known_issues.md`](known_issues.md) §6.
+
+A few hundred subjects is ample. More mostly costs runtime, and a subject whose
+pass-1 registration failed must be excluded, because a bad surface in the
+template degrades every registration made against it afterwards.
+
+### Procedure
+
+```bash
+# 1. every candidate subject through stage 02, all hemispheres and levels.
+#    This is the expensive part -- put it on a cluster.
+for s in $(cut -f1 template_cohort.tsv); do
+  for hemi in lh rh; do
+    for lv in 1 2 3 4 5 6 7 8; do
+      bin/02_make_isosurf.sh "$s" 0 "$hemi" "$lv"
+    done
+  done
+done
+python tools/check_completion.py --stage sphere   # drop whatever failed
+
+# 2. seed the template from one subject
 export WMBA_TEMPLATE_SEED=SUBJ0001/0
 bin/03_make_template_pass1.sh lh
 bin/03_make_template_pass1.sh rh
 
-# 3. register the cohort to the seed template
+# 3. register the cohort to the seed template -> ?h.sphere.reg0
+#    Also expensive; also a cluster job.
 for s in $(cut -f1 template_cohort.tsv); do
   bin/04_surfreg_pass1.sh "$s" 0 lh
   bin/04_surfreg_pass1.sh "$s" 0 rh
 done
+python tools/check_completion.py --stage reg      # exclude failures from step 4
 
-# 4. rebuild from the whole cohort
-cp config/template_subjects.example.txt config/template_subjects.txt   # then edit
+# 4. rebuild the template from the whole registered cohort -> ?hlvl?_1.tif
+cp config/template_subjects.example.txt config/template_subjects.txt
+$EDITOR config/template_subjects.txt              # one <subject>/<scan> per line
 bin/05_make_template_pass2.sh lh
 bin/05_make_template_pass2.sh rh
 ```
 
-Steps 1 and 3 are the ones to put on a cluster; each is hours per subject.
+Steps 1 and 3 dominate the cost — hours per subject each. Steps 2 and 4 are
+single jobs.
+
+Keep `config/template_subjects.txt` even though it is git-ignored: it is the
+only record of which subjects your template was built from, and a reviewer may
+ask.
+
+### After building
+
+Once `$WMBA_TEMPLATE_DIR` holds all the `_1.tif` files, process subjects
+normally with `bin/run_subject.sh` — it registers to the template and never
+rebuilds it. Do not rebuild the template partway through a cohort: subjects
+registered to different templates are not comparable.
 
 ## Checking progress
 

@@ -119,6 +119,41 @@ cohort — it costs a second and saves a day of cluster time.
 
 ## Run
 
+### First: you need a template
+
+Every subject's mid-surfaces are registered to a shared **surface registration
+template**, which is what puts vertex *i* at the same anatomical location in
+every subject. Nothing downstream works without one, so this is the first fork
+in the road:
+
+| | Do this | Cost |
+|---|---|---|
+| **A. Use an existing template** | `bin/install_template.sh <dir-or-archive>` | seconds |
+| **B. Build your own** | stages 03–05, see [`docs/pipeline.md`](docs/pipeline.md#building-a-template) | a few hundred subjects × ~a day each |
+
+**Option A is what you want unless you have a reason not to.** A template is a
+set of `<hemi>lvl<level>_1.tif` files — 16 of them for the default 2 hemispheres
+× 8 levels — that live in `$WMBA_TEMPLATE_DIR`:
+
+```bash
+bin/install_template.sh /path/to/template_dir      # or template.tar.gz
+bin/check_config.sh                                # confirms all 16 are present
+```
+
+The installer refuses a partial template rather than letting you discover the
+gap mid-run, and tells you if the template was built for a different set of
+levels than your `WMBA_LEVELS`.
+
+Template files are **not in this repository** — they are large binaries, and
+`.gitignore` blocks `*.tif` deliberately. See
+[`docs/pipeline.md`](docs/pipeline.md#obtaining-a-template) for where to get one.
+
+**Build your own (option B) when:** your cohort differs substantially in age,
+scanner or pathology from the template cohort; you changed `WMBA_LEVELS`; or you
+want the template to be derived from your own data for methodological reasons.
+Registering to a template built on a different population is usually fine — that
+is the point of a template — but it is a choice you should be able to defend.
+
 ### What you need per scan
 
 Two NIfTI images of the same person at the same session:
@@ -226,10 +261,10 @@ earlier stages, which is where failures actually happen.
 
 ### Building a template from scratch
 
-**Most users never do this.** You need it only if you have no
-`$WMBA_TEMPLATE_DIR/?hlvl?_1.tif` — the surface templates every subject is
-registered to. It is a one-off job over a few hundred subjects; the procedure is
-in [`docs/pipeline.md`](docs/pipeline.md).
+Only if you chose option B above. It is a one-off job whose cost is a few hundred
+subjects through stage 02, twice over; the full procedure, and the two-pass
+rationale, is in
+[`docs/pipeline.md`](docs/pipeline.md#building-a-template).
 
 ## Documentation
 
