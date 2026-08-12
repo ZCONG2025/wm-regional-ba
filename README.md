@@ -71,6 +71,10 @@ Stages 06 and 07 call MATLAB functions that must be on `$WMBA_MATLAB_MODULES`.
 > Reimplementing them, or substituting `mri_surf2surf` directly, is the practical
 > route until they can be replaced in-tree. Please open an issue if you need
 > this — it is the main obstacle to running the full pipeline elsewhere.
+>
+> `matlab/ResampleMesh2Icosphere_FreeSurfer.m`, which calls them, appears to be
+> adapted from the same toolbox rather than written for this project. Its
+> authorship is being confirmed — see [`NOTICE`](NOTICE).
 
 ## Install
 

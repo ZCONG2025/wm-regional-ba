@@ -16,6 +16,11 @@ function ResampleMesh2Icosphere_FreeSurfer(data_dir, tmp_dir, subject, output_di
 %       WMBA_ICO_DIR   directory holding ic<order>.tri
 %       WMBA_SURF2ICO  path to mri_surf2ico.sh
 %
+%   PROVENANCE: adapted from an earlier version of this function that was not
+%   written by the present author, and whose authorship is unresolved. See
+%   NOTICE. If you are the original author, please get in touch so this can be
+%   credited properly.
+%
 %   Original: ResampleMesh2Icosphere_FreeSurfer.m
 
     ico_dir  = getenv('WMBA_ICO_DIR');
