@@ -5,7 +5,6 @@ logs/
 data/
 srcs/
 docs/
-cluster/
 matlab/
 config/config.sh
 **/__pycache__/

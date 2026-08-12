@@ -127,9 +127,7 @@ WMBA_DATA_DIR=/scratch/$USER/wmba bin/run_subject.sh SUBJ01 ...
 | `WMBA_DATA_DIR`, `WMBA_TEMPLATE_DIR`, `WMBA_TMP_DIR`, `WMBA_FS_DIR` | outputs; default to `work/` inside the repo, move them to fast scratch for real cohorts |
 
 Optional and safely left empty: `WMBA_SYNTHSEG_*` (stage 08, QC only — nothing
-downstream reads its output). Cluster settings live separately in
-`cluster/queue.conf` (see `cluster/queue.conf.example`), and are only needed if
-you submit cohorts through SGE.
+downstream reads its output).
 
 ### FreeSurfer specifically
 
@@ -290,22 +288,21 @@ cohort stacks straight into an `(n_subjects, 8*2*40962)` matrix. Feed that to
 whatever brain-age model you like — **this repository produces the features, it
 does not fit the model.**
 
-### A cohort on an SGE cluster
+### A cohort
 
-One line per scan, `<subject> <t1_id> <flair_id> [scan]`:
+`bin/run_subject.sh` processes one scan and is the only entry point you need.
+There is no job-submission scaffolding here — schedulers differ too much between
+sites to be worth guessing at. Wrap it in whatever your cluster uses.
 
-```
-SUBJ01  I123455  I123456  0
-SUBJ02  I223455  I223456  0
-```
+Two rules matter when you do:
 
-```bash
-python cluster/make_array_job.py subjects.tsv jobs/cohort.arr
-cluster/submit_array.sh jobs/cohort.arr 300 50     # 300 tasks, 50 at a time
-```
-
-Parallelise across subjects only, never across levels within one subject — see
-[`docs/known_issues.md`](docs/known_issues.md) §3.
+- **Parallelise across subjects, never across levels or hemispheres within one
+  subject.** They share `<scan>/surf/` as scratch and will clobber each other —
+  see [`docs/known_issues.md`](docs/known_issues.md) §3.
+- **Give each task enough memory and wall time.** The Laplace solve holds several
+  float64 copies of the conformed 256³ volume, so budget ~8–16 GB per task, and
+  allow up to a day per scan. Every stage is single-threaded; extra cores buy
+  nothing.
 
 ### Checking progress
 

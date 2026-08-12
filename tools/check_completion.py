@@ -55,7 +55,8 @@ def main() -> int:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data-dir", default=os.environ.get("WMBA_DATA_DIR"))
     parser.add_argument("--subjects", type=Path, default=None,
-                        help="subject list (same format as cluster/make_array_job.py); "
+                        help="whitespace-separated subject list, one per line: "
+                             "<subject> <t1_id> <flair_id> [scan]; "
                              "default: walk --data-dir")
     parser.add_argument("--stage", default="feature", choices=sorted(STAGES),
                         help="which output to check for (default: feature)")

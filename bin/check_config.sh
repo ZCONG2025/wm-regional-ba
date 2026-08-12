@@ -5,8 +5,7 @@
 #   bin/check_config.sh
 #
 # Exits 0 if the core pipeline can run, 1 if a required item is missing.
-# Optional extras (SynthSeg, cluster submission) are reported but never cause a
-# failure.
+# Optional extras (SynthSeg) are reported but never cause a failure.
 WMBA_SKIP_VALIDATE=1   # report an invalid levels/hemis setting, do not die on it
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
@@ -193,15 +192,6 @@ if [[ -n "${WMBA_SYNTHSEG_PREDICT:-}" ]]; then
   check_file "SynthSeg predict script" "$WMBA_SYNTHSEG_PREDICT"
 else
   note "SynthSeg not configured (stage 08 will be skipped)"
-fi
-if command -v qsub >/dev/null; then
-  if [[ -f "$WMBA_ROOT/cluster/queue.conf" ]]; then
-    ok "SGE available, cluster/queue.conf present"
-  else
-    note "SGE available but no cluster/queue.conf -- cp cluster/queue.conf.example cluster/queue.conf"
-  fi
-else
-  note "qsub not found (single-machine use; cluster/ scripts unused)"
 fi
 
 # ---------------------------------------------------------------------------

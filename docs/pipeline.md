@@ -81,15 +81,13 @@ Arguments: subject id, T1 NIfTI, FLAIR image id (the basename in
 `$WMBA_FLAIR_DIR`), and scan/session id. Every step is skipped if its output
 exists, so rerunning after a failure resumes.
 
-### A cohort on an SGE cluster
+### A cohort
 
-```bash
-python cluster/make_array_job.py subjects.tsv jobs/cohort.arr
-cluster/submit_array.sh jobs/cohort.arr 300 50
-```
-
-`subjects.tsv` is `<subject> <t1_image_id> <flair_image_id> [scan]`, one per
-line. Parallelise across subjects only — see `docs/known_issues.md` §3.
+Wrap `bin/run_subject.sh` in whatever your site's scheduler is; no submission
+scripts ship with this repository. Parallelise across subjects only, never across
+levels or hemispheres within a subject — see
+[`known_issues.md`](known_issues.md) §3. Budget ~8–16 GB and up to a day per
+scan, single-threaded.
 
 ## Obtaining a template
 

@@ -28,7 +28,6 @@ config/template_subjects.txt
 
 # site-specific configuration
 config/config.sh
-cluster/queue.conf
 
 # licences that must not be redistributed
 license.txt
