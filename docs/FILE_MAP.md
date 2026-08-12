@@ -19,8 +19,7 @@ vanished by accident.
 | `MaskAndLap.sh` | `bin/lib/mask_and_lap.sh` | conda activation replaced by `$WMBA_PYTHON` |
 | `TemplateAndReg.sh` | `bin/lib/template_and_reg.sh` | same |
 | `IV_sampling.sh` | `bin/07_sampling.sh` | dropped the second, redundant `flirt` call (it re-applied the matrix the first call had just produced, with identical output); dead `dicom2nifti` lines removed |
-| `V_WMHsegmentation.sh` | `bin/08_wmh_segmentation.sh` | container path and bind mount from config; errors out cleanly when unconfigured |
-| `0_Synthseg.sh` | `bin/09_synthseg.sh` | same; the PPMI paths it carried were unused |
+| `0_Synthseg.sh` | `bin/08_synthseg.sh` | paths from config; the PPMI paths it carried were unused |
 | `run1.sh` | `bin/run_subject.sh` | same resume logic, rewritten as a loop over hemispheres instead of two copy-pasted blocks |
 | `masking.py` | `wmba/masking.py` | paths as arguments; volume shape read from the image instead of assuming 256³; named constants for the label values |
 | `laplacian.py` | `wmba/laplacian.py` | paths as arguments; `--max-iters` / `--tol` exposed with the original values as defaults; per-iteration print throttled |
@@ -62,6 +61,7 @@ these file types so they cannot be committed by accident.
 | `O_datamanagement.m` | cohort bookkeeping with hard-coded row counts (`1:1020`, `1:211`, `1:809`) against ADNI clinical tables |
 | `WMHcal.py` | despite the name it does not calculate WMH — it copies `lobes+aseg.mgz` for one cohort |
 | `V_WMHcalculation.sh` | calls `WMHcal.py` with `$CASE` and `$scanid`, neither of which it sets, and passes three arguments `WMHcal.py` does not accept. The stage was never functional. |
+| `V_WMHsegmentation.sh` | wrapped a third-party WMH segmentation container that is not this project's work. Nothing in the pipeline read its `WMH.nii.gz` output. Use whatever WMH tool you prefer, separately. |
 
 If you want any of these back, they are in the original `script/` folder — this
 repository is a fresh directory, nothing was moved or deleted there.

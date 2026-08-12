@@ -59,8 +59,7 @@ white matter.
   06 surfreg_pass2      ?h.sphere ► ?h.sphere.reg1, resample to icosphere
   07 sampling           FLAIR ► <flair_id>_?h.txt        ◄── the output
                               │
-  08 wmh_segmentation   optional, external tool
-  09 synthseg           optional, external tool
+  08 synthseg           optional, external tool, QC only
 ```
 
 Stages 03–05 follow FreeSurfer's standard two-pass template recipe

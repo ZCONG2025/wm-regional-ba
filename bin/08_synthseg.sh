@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Stage 9 (optional) - SynthSeg segmentation of the T1, used for QC and for
+# Stage 8 (optional) - SynthSeg segmentation of the T1, used for QC and for
 # alternative subcortical labels.
 #
-#   bin/09_synthseg.sh <subject> <scan>
+#   bin/08_synthseg.sh <subject> <scan>
 #
 # SynthSeg is not distributed here. Point $WMBA_SYNTHSEG_PREDICT at your copy of
 # SynthSeg_predict.py (it also ships inside FreeSurfer >= 7.3 as `mri_synthseg`).

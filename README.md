@@ -28,8 +28,6 @@ Nothing below is redistributed here — you install and license each yourself.
 | FSL | 6.x | [install](https://fsl.fmrib.ox.ac.uk/fsl/docs/#/install/index) | stage 07: `bet`, `flirt` |
 | MATLAB | R2020b+ | [mathworks.com](https://www.mathworks.com/products/matlab.html) | stages 06–07: icosphere resampling, `.obj` → `.mat` |
 | Python | 3.9+ | [python.org](https://www.python.org/downloads/) or [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/) | the `wmba` package |
-| SGE (`qsub`) | — | site-provided | `cluster/` only; not needed for single subjects |
-| Singularity | — | [install](https://docs.sylabs.io/guides/latest/user-guide/quick_start.html) | stage 08 only (optional WMH segmentation) |
 
 FreeSurfer only runs on Linux and macOS. On Windows use WSL2 with a Linux
 distribution.
@@ -124,9 +122,10 @@ WMBA_DATA_DIR=/scratch/$USER/wmba bin/run_subject.sh SUBJ01 ...
 | `WMBA_T1_DIR`, `WMBA_FLAIR_DIR` | where your input NIfTIs live |
 | `WMBA_DATA_DIR`, `WMBA_TEMPLATE_DIR`, `WMBA_TMP_DIR`, `WMBA_FS_DIR` | outputs; default to `work/` inside the repo, move them to fast scratch for real cohorts |
 
-Optional and safely left empty: `WMBA_WMHSEG_*` (stage 08) and
-`WMBA_SYNTHSEG_*` (stage 09). Cluster settings live separately in
-`cluster/queue.conf` (see `cluster/queue.conf.example`).
+Optional and safely left empty: `WMBA_SYNTHSEG_*` (stage 08, QC only — nothing
+downstream reads its output). Cluster settings live separately in
+`cluster/queue.conf` (see `cluster/queue.conf.example`), and are only needed if
+you submit cohorts through SGE.
 
 ### FreeSurfer specifically
 

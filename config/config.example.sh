@@ -76,13 +76,8 @@ export WMBA_ICO_DIR="${WMBA_ICO_DIR:-/path/to/freesurfer_scripts}"
 # Path to the mri_surf2ico.sh wrapper
 export WMBA_SURF2ICO="${WMBA_SURF2ICO:-/path/to/freesurfer_scripts/mri_surf2ico.sh}"
 
-# --- optional: WMH segmentation (external Singularity image) ---------------
-# Leave empty to skip bin/05_wmh_segmentation.sh
-export WMBA_WMHSEG_SIF="${WMBA_WMHSEG_SIF:-}"
-export WMBA_WMHSEG_SCRIPT="${WMBA_WMHSEG_SCRIPT:-}"
-export WMBA_WMHSEG_BIND="${WMBA_WMHSEG_BIND:-$WMBA_DATA_DIR}"
-
 # --- optional: SynthSeg ----------------------------------------------------
-# Leave empty to skip bin/06_synthseg.sh
+# Only used by bin/08_synthseg.sh, which produces a segmentation for QC. Nothing
+# downstream reads it. Leave empty to skip that stage.
 export WMBA_SYNTHSEG_PREDICT="${WMBA_SYNTHSEG_PREDICT:-}"
 export WMBA_SYNTHSEG_PYTHON="${WMBA_SYNTHSEG_PYTHON:-$WMBA_PYTHON}"
