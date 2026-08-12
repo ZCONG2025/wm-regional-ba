@@ -1,13 +1,49 @@
-# Pinned to major versions that were verified to work together.
-# Loosen these only if you re-check that mne.write_surface still emits the
-# FreeSurfer binary surface format the pipeline expects.
+# Python dependencies for the wmba package.
+#
+#   pip install -r requirements.txt        or        pip install -e .
+#
+# Pinned to major versions verified to work together. Loosen only if you
+# re-check that mne.write_surface still emits the FreeSurfer binary surface
+# format the pipeline expects.
+#
+# See the README "Requirements" section for what each one is used by, and for the
+# external software (FreeSurfer, FSL, MATLAB) that is NOT installable from here.
+
+# https://numpy.org/install/
+# Used everywhere. <2.0 because the pinned torch/scipy builds predate the NumPy 2 ABI.
 numpy>=1.24,<2.0
+
+# https://scipy.org/install/
+# laplacian.py: ndimage.convolve for the Jacobi sweep, generate_binary_structure
+# sampling.py:  io.loadmat for the surface coordinates written by MATLAB
 scipy>=1.10
+
+# https://nipy.org/nibabel/installation.html
+# All volume I/O: .mgz (FreeSurfer) and .nii.gz (NIfTI).
 nibabel>=5.0
+
+# https://mne.tools/stable/install/index.html
+# masking.py, marching_cube.py: read_surface / write_surface for FreeSurfer's
+# binary surface format, and transforms.apply_trans.
+# NOTE: a large dependency for surface I/O alone. nibabel.freesurfer.io offers
+# read_geometry/write_geometry as a lighter equivalent; swapping would need the
+# output verified byte-for-byte against mne's writer before trusting it.
 mne>=1.5
+
+# https://scikit-image.org/docs/stable/user_guide/install.html
+# marching_cube.py: measure.marching_cubes to extract each iso-surface.
 scikit-image>=0.21
+
+# https://trimesh.org/install.html
+# mesh_utils.py: voxelising the white surface into the Laplace domain mask.
 trimesh>=4.0
+
+# https://pytorch.org/get-started/locally/
+# mesh_utils.py, sampling.py: F.grid_sample for trilinear/nearest interpolation
+# at vertex locations. NO GPU IS USED -- install the CPU build and save ~2 GB:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
 torch>=2.0
 
-# tools/dicom_to_nifti.py only
+# https://simpleitk.readthedocs.io/en/master/gettingStarted.html
+# tools/dicom_to_nifti.py only. Skip it if your inputs are already NIfTI.
 SimpleITK>=2.3
