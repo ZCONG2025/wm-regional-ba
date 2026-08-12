@@ -73,9 +73,9 @@
   <text x="572" y="230" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="11" fill="#2b3138">8 levels x 2 hemispheres</text>
 
   <rect x="572" y="248" width="200" height="46" rx="4" fill="#e9edf2" stroke="#d9dde3"/>
-  <text x="584" y="266" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="10.5" fill="#2b3138">655392 values per scan</text>
-  <text x="584" y="283" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="10.5" fill="#6b7480">vertex i = same location</text>
+  <text x="584" y="266" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="10.5" fill="#2b3138">vertex i = same location</text>
+  <text x="584" y="283" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="10.5" fill="#6b7480">in every subject</text>
 
-  <text x="572" y="316" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7480">in every subject, so a cohort</text>
-  <text x="572" y="331" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7480">stacks into one matrix</text>
+  <text x="572" y="316" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7480">so a cohort stacks straight</text>
+  <text x="572" y="331" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7480">into one matrix</text>
 </svg>
