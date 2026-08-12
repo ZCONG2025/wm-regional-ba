@@ -235,11 +235,11 @@ def load_scan(data_dir, subject, scan, flair_id, levels=range(1, 9)):
 
 x = load_scan("/work/data", "SUBJ01", "0", "I123456")
 x.shape        # (8, 2, 40962)
-x.reshape(-1)  # 655392-element feature vector for this scan
+x.reshape(-1)  # flat feature vector, 8*2*40962 elements
 ```
 
 Vertex *i* at level *l* is the same white-matter location in every subject, so a
-cohort stacks straight into an `(n_subjects, 655392)` matrix. Feed that to
+cohort stacks straight into an `(n_subjects, 8*2*40962)` matrix. Feed that to
 whatever brain-age model you like — **this repository produces the features, it
 does not fit the model.**
 
