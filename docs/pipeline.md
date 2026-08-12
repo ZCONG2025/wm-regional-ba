@@ -99,14 +99,22 @@ A template is a set of `<hemi>lvl<level>_1.tif` files in `$WMBA_TEMPLATE_DIR` �
 to it, and that registration is what makes vertex *i* mean the same location
 across subjects. **Nothing downstream works without one.**
 
-They are not in this repository: they are large binaries, and `.gitignore`
-blocks `*.tif` on purpose. Distribute or obtain them as a release asset or a
-Zenodo archive, then:
+They are not in the repository itself: they are large binaries, and `.gitignore`
+blocks `*.tif` on purpose. The template used for the reference analysis is
+published as a release asset:
 
 ```bash
-bin/install_template.sh /path/to/template_dir     # or template.tar.gz / .zip
+curl -LO https://github.com/ZCONG2025/wm-regional-ba/releases/latest/download/wmba-template-adni399.tar.gz
+bin/install_template.sh wmba-template-adni399.tar.gz
 bin/check_config.sh                               # confirms all 16 are present
 ```
+
+It was built from **399 ADNI subjects** (400 selected, one dropped for a failed
+first-pass registration) and contains the `_1` cohort averages for levels 1–8,
+both hemispheres. The single-subject seed templates are not included: they are
+not needed to process subjects, and unlike a cohort average they carry one
+individual's folding pattern. Building your own template makes its own seed
+(stage 03).
 
 `install_template.sh` verifies the whole set before copying anything, so an
 incomplete template fails immediately rather than three hours into a run. It also
@@ -130,15 +138,32 @@ The two passes break that circularity:
 1. **Seed.** Build a template from a *single* subject. It is arbitrary and
    biased toward that one anatomy, but it gives every other subject something to
    register to.
-2. **Rebuild.** Register the whole cohort to the seed template, then rebuild the
-   template from all of those registrations. The result is an average, and the
-   individual seed's idiosyncrasies wash out.
+2. **Cohort average.** Register the whole cohort to the seed template, then
+   rebuild the template from all of those registrations. The result is an
+   average, and the individual seed's idiosyncrasies wash out.
 
-Only the second-pass templates (`_1.tif`) are used to process subjects. The
-first-pass ones exist solely to bootstrap the second.
+### Naming convention
 
-Do not iterate further: a third pass buys almost nothing and the FreeSurfer
-recipe does not call for one.
+The suffix counts cohort-average generations, not passes:
+
+| File | Built from | Used for |
+|---|---|---|
+| `<hemi>lvl<N>.tif` | the single seed subject | producing `sphere.reg0` |
+| `<hemi>lvl<N>_1.tif` | the cohort, aligned by `sphere.reg0` | producing `sphere.reg1` |
+
+Correspondingly, `<hemi>.sphere.reg0` is the registration to the seed and
+`<hemi>.sphere.reg1` the registration to the cohort average.
+
+**`_1` is the template subjects are processed against**, and `sphere.reg1` is
+what the icosphere resampling in stage 06 consumes. That is one registration to
+the cohort average per subject.
+
+The convention extends: you can register the cohort to `_1`, average again into
+`_2`, and register subjects to that. Whether the extra generation is worth the
+compute is a judgement call, and the reference analysis did not use one — the
+published results come from `_1`. If you do build a `_2`, point
+`bin/06_surfreg_pass2.sh` at it and carry the change through `install_template.sh`
+and `check_config.sh`, which both look for `_1` by name.
 
 ### What the original study used
 

@@ -131,28 +131,39 @@ in the road:
 | **A. Use an existing template** | `bin/install_template.sh <dir-or-archive>` | seconds |
 | **B. Build your own** | stages 03–05, see [`docs/pipeline.md`](docs/pipeline.md#building-a-template) | a few hundred subjects × ~a day each |
 
-**Option A is what you want unless you have a reason not to.** A template is a
-set of `<hemi>lvl<level>_1.tif` files — 16 of them for the default 2 hemispheres
-× 8 levels — that live in `$WMBA_TEMPLATE_DIR`:
+**Option A is what you want unless you have a reason not to.** The template used
+for the reference analysis is published as a release asset — 16
+`<hemi>lvl<level>_1.tif` files (2 hemispheres × 8 levels), built from 399 ADNI
+subjects:
 
 ```bash
-bin/install_template.sh /path/to/template_dir      # or template.tar.gz
+curl -LO https://github.com/ZCONG2025/wm-regional-ba/releases/latest/download/wmba-template-adni399.tar.gz
+bin/install_template.sh wmba-template-adni399.tar.gz
 bin/check_config.sh                                # confirms all 16 are present
 ```
 
-The installer refuses a partial template rather than letting you discover the
-gap mid-run, and tells you if the template was built for a different set of
-levels than your `WMBA_LEVELS`.
+The installer verifies the whole set before copying anything, so an incomplete
+template fails immediately rather than three hours into a run, and it tells you
+if the template was built for a different set of levels than your
+`WMBA_LEVELS`. Template files are not in the repository itself — they are large
+binaries, and `.gitignore` blocks `*.tif` deliberately.
 
-Template files are **not in this repository** — they are large binaries, and
-`.gitignore` blocks `*.tif` deliberately. See
-[`docs/pipeline.md`](docs/pipeline.md#obtaining-a-template) for where to get one.
+> **Input geometry.** The published template is intended for T1 images that are
+> **1 mm isotropic with whole-brain coverage** — the geometry of the UK Biobank
+> data the reference brain-age models were trained on. `recon-all` conforms any
+> input to 256³ at 1 mm, so the acquisition matrix does not have to match; what
+> matters is the voxel size and the coverage. Coarser or anisotropic data is
+> interpolated during conforming, which smooths the surfaces and shifts the
+> sampled FLAIR values; a truncated field of view truncates the white-matter
+> surface and degrades the registration. If your data differs materially on
+> either count, prefer option B.
 
-**Build your own (option B) when:** your cohort differs substantially in age,
-scanner or pathology from the template cohort; you changed `WMBA_LEVELS`; or you
-want the template to be derived from your own data for methodological reasons.
-Registering to a template built on a different population is usually fine — that
-is the point of a template — but it is a choice you should be able to defend.
+**Build your own (option B) when:** your data is not 1 mm isotropic whole-brain;
+your cohort differs substantially in age, scanner or pathology from the template
+cohort; you changed `WMBA_LEVELS`; or you want the template derived from your own
+data for methodological reasons. Registering to a template built on a different
+population is usually fine — that is the point of a template — but it is a choice
+you should be able to defend.
 
 ### What you need per scan
 
