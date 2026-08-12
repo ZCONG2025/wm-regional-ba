@@ -18,14 +18,23 @@ from skimage import measure
 
 from wmba.paths import add_common_args, resolve
 
-# Iso-value per level. Index 0 and 9 are kept for reference but are not part of
-# the default $WMBA_LEVELS (1..8).
+# Iso-value per level. Indices 0 and 9 are kept for reference but are NOT
+# supported: level 0 sits essentially on the WM surface, where marching cubes is
+# often degenerate, and level 9 runs into the ventricle. The published template
+# covers 1..8 only.
 LAP_VAL = [9998.5, 9995, 9970, 9880, 9500, 8700, 7300, 6000, 5000, 3000]
+
+MIN_LEVEL, MAX_LEVEL = 1, 8
 
 
 def extract(scan_dir, hemi: str, level: int) -> str:
-    if not 0 <= level < len(LAP_VAL):
-        raise SystemExit(f"level must be in 0..{len(LAP_VAL) - 1}, got {level}")
+    if not MIN_LEVEL <= level <= MAX_LEVEL:
+        raise SystemExit(
+            f"level must be in {MIN_LEVEL}..{MAX_LEVEL}, got {level}. "
+            "Levels 0 and 9 have iso-values defined in LAP_VAL but are not "
+            "supported: 0 is degenerate on the WM surface and 9 reaches the "
+            "ventricle."
+        )
 
     lap_path = scan_dir / "mask" / f"lap_{hemi}.nii"
     if not lap_path.is_file():
@@ -53,7 +62,9 @@ def main() -> None:
     )
     add_common_args(parser)
     parser.add_argument(
-        "--level", type=int, required=True, help=f"0..{len(LAP_VAL) - 1}"
+        "--level", type=int, required=True, choices=range(MIN_LEVEL, MAX_LEVEL + 1),
+        metavar=f"{{{MIN_LEVEL}..{MAX_LEVEL}}}",
+        help=f"iso-level, {MIN_LEVEL} (superficial) to {MAX_LEVEL} (deep)",
     )
     args = parser.parse_args()
 

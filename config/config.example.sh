@@ -30,7 +30,14 @@ export WMBA_FS_DIR="${WMBA_FS_DIR:-$WMBA_ROOT/work/freesurfer}"
 # --- pipeline parameters ---------------------------------------------------
 # Laplacian iso-levels to extract. 1 = superficial (just under the WM/GM
 # boundary), 8 = deep (close to the ventricle). See wmba/marching_cube.py:LAP_VAL.
+#
+# ONLY 1..8 ARE SUPPORTED, and the pipeline refuses anything else. LAP_VAL also
+# defines iso-values for 0 and 9, but 0 sits essentially on the WM surface where
+# marching cubes is often degenerate, 9 reaches the ventricle, and the published
+# template covers 1..8 only. Narrowing the set (e.g. "2 4 6 8") is fine and
+# proportionally faster; widening it is not.
 export WMBA_LEVELS="${WMBA_LEVELS:-1 2 3 4 5 6 7 8}"
+# Both hemispheres. Only lh and rh are valid.
 export WMBA_HEMIS="${WMBA_HEMIS:-lh rh}"
 # Icosphere subdivision order. 6 -> 40962 vertices per hemisphere.
 export WMBA_ICO_ORDER="${WMBA_ICO_ORDER:-6}"

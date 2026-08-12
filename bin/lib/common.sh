@@ -25,6 +25,40 @@ wmba_log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >&2; }
 
 wmba_die() { echo "ERROR: $*" >&2; exit 1; }
 
+# Levels outside 1..8 are not supported: LAP_VAL defines iso-values for 0 and 9,
+# but level 0 sits essentially on the WM surface and marching cubes there is
+# often degenerate, level 9 runs into the ventricle, and the published template
+# covers 1..8 only. Validated here so a bad setting fails at once rather than
+# hours in.
+WMBA_VALID_LEVELS="1 2 3 4 5 6 7 8"
+WMBA_VALID_HEMIS="lh rh"
+
+wmba_validate_config() {
+  local bad=() lv hemi
+  for lv in ${WMBA_LEVELS:-}; do
+    [[ " $WMBA_VALID_LEVELS " == *" $lv "* ]] || bad+=("level '$lv'")
+  done
+  for hemi in ${WMBA_HEMIS:-}; do
+    [[ " $WMBA_VALID_HEMIS " == *" $hemi "* ]] || bad+=("hemisphere '$hemi'")
+  done
+  [[ -n "${WMBA_LEVELS:-}" ]] || bad+=("WMBA_LEVELS is empty")
+  [[ -n "${WMBA_HEMIS:-}"  ]] || bad+=("WMBA_HEMIS is empty")
+
+  if [[ ${#bad[@]} -gt 0 ]]; then
+    printf 'ERROR: unsupported configuration: %s\n' "$(IFS=', '; echo "${bad[*]}")" >&2
+    printf '       WMBA_LEVELS must be a subset of: %s\n' "$WMBA_VALID_LEVELS" >&2
+    printf '       WMBA_HEMIS  must be a subset of: %s\n' "$WMBA_VALID_HEMIS" >&2
+    return 1
+  fi
+  return 0
+}
+
+# check_config.sh sets WMBA_SKIP_VALIDATE so it can report this alongside its
+# other checks instead of dying before it prints anything.
+if [[ -z "${WMBA_SKIP_VALIDATE:-}" ]]; then
+  wmba_validate_config || exit 1
+fi
+
 # Load the FreeSurfer environment. Idempotent.
 wmba_setup_freesurfer() {
   [[ -d "${FREESURFER_HOME:-}" ]] || wmba_die "FREESURFER_HOME is not a directory: ${FREESURFER_HOME:-<unset>}"

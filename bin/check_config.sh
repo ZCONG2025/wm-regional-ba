@@ -7,6 +7,7 @@
 # Exits 0 if the core pipeline can run, 1 if a required item is missing.
 # Optional stages (WMH segmentation, SynthSeg, cluster submission) are reported
 # but never cause a failure.
+WMBA_SKIP_VALIDATE=1   # report an invalid levels/hemis setting, do not die on it
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
 # common.sh sets -e; here we want to run every check and report at the end.
@@ -39,6 +40,20 @@ if [[ -f "$WMBA_ROOT/config/config.sh" ]]; then
   ok "config/config.sh"
 else
   bad "config/config.sh missing -- run: cp config/config.example.sh config/config.sh"
+fi
+
+# ---------------------------------------------------------------------------
+head_ "Levels and hemispheres"
+validate_msg="$(wmba_validate_config 2>&1)"
+if [[ -z "$validate_msg" ]]; then
+  n_lv=$(echo $WMBA_LEVELS | wc -w); n_h=$(echo $WMBA_HEMIS | wc -w)
+  ok "WMBA_LEVELS='$WMBA_LEVELS'  WMBA_HEMIS='$WMBA_HEMIS'  -> $((n_lv*n_h)) features per scan"
+else
+  # here-string, not a pipe: a pipe would run the loop in a subshell and the
+  # failure counter would never reach the parent, breaking the exit code.
+  while IFS= read -r line; do
+    bad "${line#ERROR: }"
+  done <<< "$validate_msg"
 fi
 
 # ---------------------------------------------------------------------------
