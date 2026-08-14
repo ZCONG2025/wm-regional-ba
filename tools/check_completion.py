@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Report which subject / scan / level / hemisphere outputs are still missing.
+"""Report which subject / session / level / hemisphere outputs are still missing.
 
     python tools/check_completion.py --flair-id I123456
     python tools/check_completion.py --subjects subjects.tsv --stage resampled
 
-Prints one line per incomplete scan, and a summary. Exit status is 1 if anything
+Prints one line per incomplete session, and a summary. Exit status is 1 if anything
 is missing, so it can gate a downstream step.
 
 Replaces the ad-hoc CheckIDs.py / II_ClearData.py loops, which hard-coded one
@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 STAGES = {
-    # stage name -> filename template relative to <scan_dir>
+    # stage name -> filename template relative to <session_dir>
     "lap": "mask/lap_{hemi}.nii",
     "surf": "surf/{hemi}.lvl{level}",
     "sphere": "midsurf/lvl{level}/{hemi}.sphere",
@@ -33,7 +33,7 @@ def parse_levels(spec: str) -> list[int]:
     return [int(x) for x in spec.replace(",", " ").split()]
 
 
-def iter_scans(data_dir: Path, subject_list: Path | None):
+def iter_sessions(data_dir: Path, subject_list: Path | None):
     if subject_list is not None:
         for line in subject_list.read_text().splitlines():
             line = line.strip()
@@ -41,13 +41,13 @@ def iter_scans(data_dir: Path, subject_list: Path | None):
                 continue
             fields = line.split()
             subject = fields[0]
-            scan = fields[3] if len(fields) > 3 else "0"
+            session = fields[3] if len(fields) > 3 else "0"
             flair = fields[2] if len(fields) > 2 else None
-            yield subject, scan, flair
+            yield subject, session, flair
     else:
         for subj_dir in sorted(p for p in data_dir.iterdir() if p.is_dir()):
-            for scan_path in sorted(p for p in subj_dir.iterdir() if p.is_dir()):
-                yield subj_dir.name, scan_path.name, None
+            for sess_path in sorted(p for p in subj_dir.iterdir() if p.is_dir()):
+                yield subj_dir.name, sess_path.name, None
 
 
 def main() -> int:
@@ -56,7 +56,7 @@ def main() -> int:
     parser.add_argument("--data-dir", default=os.environ.get("WMBA_DATA_DIR"))
     parser.add_argument("--subjects", type=Path, default=None,
                         help="whitespace-separated subject list, one per line: "
-                             "<subject> <t1_id> <flair_id> [scan]; "
+                             "<subject> <t1_id> <flair_id> [session]; "
                              "default: walk --data-dir")
     parser.add_argument("--stage", default="feature", choices=sorted(STAGES),
                         help="which output to check for (default: feature)")
@@ -78,11 +78,11 @@ def main() -> int:
     levels = parse_levels(args.levels)
     hemis = args.hemis.split()
 
-    n_scans = n_incomplete = n_missing = 0
+    n_sessions = n_incomplete = n_missing = 0
 
-    for subject, scan, list_flair in iter_scans(data_dir, args.subjects):
-        n_scans += 1
-        scan_dir = data_dir / subject / scan
+    for subject, session, list_flair in iter_sessions(data_dir, args.subjects):
+        n_sessions += 1
+        session_dir = data_dir / subject / session
         flair_id = list_flair or args.flair_id
         if "{flair_id}" in template and not flair_id:
             parser.error("--stage feature needs --flair-id (or a 3-column --subjects file)")
@@ -93,18 +93,18 @@ def main() -> int:
                 rel = template.format(
                     hemi=hemi, level=level, order=args.order, flair_id=flair_id
                 )
-                if not (scan_dir / rel).is_file():
+                if not (session_dir / rel).is_file():
                     missing.append(rel)
 
         if missing:
             n_incomplete += 1
             n_missing += len(missing)
             if not args.quiet:
-                print(f"{subject}\t{scan}\tmissing {len(missing)}: {missing[0]}"
+                print(f"{subject}\t{session}\tmissing {len(missing)}: {missing[0]}"
                       + (" ..." if len(missing) > 1 else ""))
 
     print(
-        f"\n{n_scans - n_incomplete}/{n_scans} scans complete for stage "
+        f"\n{n_sessions - n_incomplete}/{n_sessions} sessions complete for stage "
         f"'{args.stage}' ({n_missing} files missing)",
         file=sys.stderr,
     )

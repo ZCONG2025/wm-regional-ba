@@ -27,7 +27,7 @@ LAP_VAL = [9998.5, 9995, 9970, 9880, 9500, 8700, 7300, 6000, 5000, 3000]
 MIN_LEVEL, MAX_LEVEL = 1, 8
 
 
-def extract(scan_dir, hemi: str, level: int) -> str:
+def extract(session_dir, hemi: str, level: int) -> str:
     if not MIN_LEVEL <= level <= MAX_LEVEL:
         raise SystemExit(
             f"level must be in {MIN_LEVEL}..{MAX_LEVEL}, got {level}. "
@@ -36,7 +36,7 @@ def extract(scan_dir, hemi: str, level: int) -> str:
             "ventricle."
         )
 
-    lap_path = scan_dir / "mask" / f"lap_{hemi}.nii"
+    lap_path = session_dir / "mask" / f"lap_{hemi}.nii"
     if not lap_path.is_file():
         raise SystemExit(f"missing input: {lap_path} (run wmba.laplacian first)")
 
@@ -46,7 +46,7 @@ def extract(scan_dir, hemi: str, level: int) -> str:
         lap, LAP_VAL[level], allow_degenerate=True
     )
 
-    out_dir = scan_dir / "surf"
+    out_dir = session_dir / "surf"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{hemi}.lvl{level}"
 
@@ -68,8 +68,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    scan_dir = resolve(args)
-    print(extract(scan_dir, args.hemi, args.level))
+    session_dir = resolve(args)
+    print(extract(session_dir, args.hemi, args.level))
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 """Working-directory layout and the CLI arguments shared by every stage.
 
-All stages operate on a single scan directory:
+All stages operate on a single session directory:
 
-    $WMBA_DATA_DIR/<subject>/<scan>/
+    $WMBA_DATA_DIR/<subject>/<session>/
         aseg.mgz                    from FreeSurfer
         brain.mgz                   from FreeSurfer
         lh.white  rh.white          from FreeSurfer
@@ -37,13 +37,13 @@ def data_root(explicit: str | None = None) -> Path:
     return Path(root)
 
 
-def scan_dir(data_dir: Path, subject: str, scan: str) -> Path:
-    return data_dir / str(subject) / str(scan)
+def session_dir(data_dir: Path, subject: str, session: str) -> Path:
+    return data_dir / str(subject) / str(session)
 
 
 def add_common_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("--subject", required=True, help="subject identifier")
-    parser.add_argument("--scan", default="0", help="scan/session identifier (default: 0)")
+    parser.add_argument("--session", default="0", help="session/session identifier (default: 0)")
     parser.add_argument("--hemi", required=True, choices=["lh", "rh"], help="hemisphere")
     parser.add_argument(
         "--data-dir",
@@ -54,5 +54,5 @@ def add_common_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 
 
 def resolve(args) -> Path:
-    """Return the scan directory for a parsed argument namespace."""
-    return scan_dir(data_root(args.data_dir), args.subject, args.scan)
+    """Return the session directory for a parsed argument namespace."""
+    return session_dir(data_root(args.data_dir), args.subject, args.session)

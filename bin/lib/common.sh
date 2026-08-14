@@ -91,10 +91,10 @@ wmba_setup_fsl() {
   export PATH="$FSLDIR/bin:$PATH"
 }
 
-# Absolute path to a subject/scan working directory.
-wmba_scan_dir() {
-  local subject="$1" scan="$2"
-  echo "$WMBA_DATA_DIR/$subject/$scan"
+# Absolute path to a subject/session working directory.
+wmba_session_dir() {
+  local subject="$1" session="$2"
+  echo "$WMBA_DATA_DIR/$subject/$session"
 }
 
 wmba_require_cmd() {

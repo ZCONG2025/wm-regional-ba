@@ -4,7 +4,7 @@
 #
 #   bin/05_make_template_pass2.sh <hemi> [subject_list]
 #
-# subject_list: one "<subject>/<scan>" per line. Defaults to
+# subject_list: one "<subject>/<session>" per line. Defaults to
 #               $WMBA_TEMPLATE_SUBJECTS (config/template_subjects.txt).
 #
 # Writes : $WMBA_TEMPLATE_DIR/<hemi>lvl<level>_1.tif   for each level

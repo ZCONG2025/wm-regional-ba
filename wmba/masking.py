@@ -31,9 +31,9 @@ VENTRICLE_LABEL = {"lh": 4, "rh": 43}
 OUTSIDE, INSIDE, VENTRICLE = 3, 2, 1
 
 
-def make_mask(scan_dir, hemi: str) -> str:
-    aseg_path = scan_dir / "aseg.mgz"
-    white_path = scan_dir / f"{hemi}.white"
+def make_mask(session_dir, hemi: str) -> str:
+    aseg_path = session_dir / "aseg.mgz"
+    white_path = session_dir / f"{hemi}.white"
     for p in (aseg_path, white_path):
         if not p.is_file():
             raise SystemExit(f"missing input: {p}")
@@ -61,7 +61,7 @@ def make_mask(scan_dir, hemi: str) -> str:
     mask[mask == 2] = INSIDE
     mask[seg == VENTRICLE_LABEL[hemi]] = VENTRICLE
 
-    out_dir = scan_dir / "mask"
+    out_dir = session_dir / "mask"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"lap_mask_{hemi}.nii"
 
@@ -81,8 +81,8 @@ def main() -> None:
     add_common_args(parser)
     args = parser.parse_args()
 
-    scan_dir = resolve(args)
-    print(make_mask(scan_dir, args.hemi))
+    session_dir = resolve(args)
+    print(make_mask(session_dir, args.hemi))
 
 
 if __name__ == "__main__":

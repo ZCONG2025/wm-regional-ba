@@ -31,13 +31,13 @@ DEFAULT_TOL = 5e-7
 
 
 def solve(
-    scan_dir,
+    session_dir,
     hemi: str,
     max_iters: int = DEFAULT_MAX_ITERS,
     tol: float = DEFAULT_TOL,
     verbose: bool = False,
 ) -> str:
-    mask_path = scan_dir / "mask" / f"lap_mask_{hemi}.nii"
+    mask_path = session_dir / "mask" / f"lap_mask_{hemi}.nii"
     if not mask_path.is_file():
         raise SystemExit(f"missing input: {mask_path} (run wmba.masking first)")
 
@@ -78,7 +78,7 @@ def solve(
 
     print(f"converged after {iters} iterations (err {err:.3e})")
 
-    out_path = scan_dir / "mask" / f"lap_{hemi}.nii"
+    out_path = session_dir / "mask" / f"lap_{hemi}.nii"
     nib.save(
         nib.Nifti1Image(
             grid.reshape(shape).astype(np.int32), seg_img.affine, seg_img.header
@@ -98,8 +98,8 @@ def main() -> None:
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
-    scan_dir = resolve(args)
-    print(solve(scan_dir, args.hemi, args.max_iters, args.tol, args.verbose))
+    session_dir = resolve(args)
+    print(solve(session_dir, args.hemi, args.max_iters, args.tol, args.verbose))
 
 
 if __name__ == "__main__":

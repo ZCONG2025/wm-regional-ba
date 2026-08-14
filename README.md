@@ -223,7 +223,7 @@ bin/run_subject.sh SUBJ01 I123455 I123456 0
 | 1 | `SUBJ01` | subject id — becomes the first output directory level |
 | 2 | `I123455` | T1 image id — resolved as `$WMBA_T1_DIR/I123455.nii.gz` |
 | 3 | `I123456` | FLAIR image id — resolved as `$WMBA_FLAIR_DIR/I123456.nii.gz` |
-| 4 | `0` | **session number** — becomes the second output directory level |
+| 4 | `0` | **session number**, optional, defaults to `0` — becomes the second output directory level |
 
 So that command writes to `$WMBA_DATA_DIR/SUBJ01/0/`. The session number says
 which timepoint this scan is for that subject (the scripts' usage strings call
@@ -235,7 +235,26 @@ bin/run_subject.sh SUBJ01 I223455 I223456 1     # -> SUBJ01/1/
 ```
 
 Sessions are processed independently and never share files, so they are safe to
-run in parallel.
+run in parallel. Each session gets its own `recon-all`, under
+`$WMBA_FS_DIR/<subject>/<session>/`.
+
+### If you already have FreeSurfer output
+
+`recon-all` is **stage 00 of this pipeline, not a prerequisite** — `run_subject.sh`
+runs it for you. But it is 8–14 h per session, and most groups have already run it.
+
+To reuse existing output, put the FreeSurfer subject directory at
+`$WMBA_FS_DIR/<subject>/<session>/` so that
+`$WMBA_FS_DIR/<subject>/<session>/mri/aseg.mgz` exists. Stage 00 is then skipped,
+the T1 is never read, and you can pass `-` in its place:
+
+```bash
+bin/run_subject.sh SUBJ01 - I123456 0
+```
+
+Only four files are taken from it — `mri/aseg.mgz`, `mri/brain.mgz`,
+`surf/lh.white`, `surf/rh.white` — so a complete `recon-all -all` run is what you
+need; a partial one that stopped before the surface stream is not enough.
 
 That one command runs the whole chain — FreeSurfer `recon-all`, the Laplace
 solve, eight iso-surfaces per hemisphere, spherical registration to the

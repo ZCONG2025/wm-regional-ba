@@ -87,4 +87,4 @@ else
 fi
 echo
 echo "Verify with: bin/check_config.sh"
-echo "Then run:    bin/run_subject.sh <subject> <t1_nifti> <flair_id> [scan]"
+echo "Then run:    bin/run_subject.sh <subject> <t1_nifti> <flair_id> [session]"

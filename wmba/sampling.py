@@ -66,13 +66,13 @@ def load_vertices(mid_dir, hemi: str, level: int, order: str | int | None = None
     )
 
 
-def sample(scan_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "legacy") -> str:
-    flair_path = scan_dir / f"{flair_id}_FLAIR_converted.nii.gz"
-    aseg_path = scan_dir / "aseg.mgz"
+def sample(session_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "legacy") -> str:
+    flair_path = session_dir / f"{flair_id}_FLAIR_converted.nii.gz"
+    aseg_path = session_dir / "aseg.mgz"
     for p in (flair_path, aseg_path):
         if not p.is_file():
             raise SystemExit(f"missing input: {p}")
-    mid_dir = scan_dir / "midsurf" / f"lvl{level}"
+    mid_dir = session_dir / "midsurf" / f"lvl{level}"
 
     flair_img = nib.load(str(flair_path))
     flair = flair_img.get_fdata()
@@ -127,8 +127,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    scan_dir = resolve(args)
-    print(sample(scan_dir, args.hemi, args.level, args.flair, args.bgit_mask))
+    session_dir = resolve(args)
+    print(sample(session_dir, args.hemi, args.level, args.flair, args.bgit_mask))
 
 
 if __name__ == "__main__":

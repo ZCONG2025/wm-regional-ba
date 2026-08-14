@@ -3,34 +3,34 @@
 # resample the mid-surface onto a standard icosphere, so every subject ends up
 # with the same vertex count and the same vertex ordering.
 #
-#   bin/06_surfreg_pass2.sh <subject> <scan> <hemi> <level>
+#   bin/06_surfreg_pass2.sh <subject> <session> <hemi> <level>
 #
-# Writes : <scan_dir>/midsurf/lvl<level>/<hemi>_lvl<level>_ico_<order>
+# Writes : <session_dir>/midsurf/lvl<level>/<hemi>_lvl<level>_ico_<order>
 #          (a FreeSurfer binary surface, 40962 vertices at order 6)
 #
 # Original: III_SurfReg2.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
-usage() { echo "usage: $(basename "$0") <subject> <scan> <hemi> <level>" >&2; exit 2; }
+usage() { echo "usage: $(basename "$0") <subject> <session> <hemi> <level>" >&2; exit 2; }
 [[ $# -eq 4 ]] || usage
 
-subject="$1"; scan="$2"; hemi="$3"; level="$4"
-scan_dir="$(wmba_scan_dir "$subject" "$scan")"
-mid="$scan_dir/midsurf/lvl$level"
+subject="$1"; session="$2"; hemi="$3"; level="$4"
+session_dir="$(wmba_session_dir "$subject" "$session")"
+mid="$session_dir/midsurf/lvl$level"
 
 wmba_setup_freesurfer
 
 template="$WMBA_TEMPLATE_DIR/${hemi}lvl${level}_1.tif"
 [[ -f "$template" ]] || wmba_die "template not found: $template (see docs/pipeline.md)"
-[[ -f "$scan_dir/brain.mgz" ]] || wmba_die "missing $scan_dir/brain.mgz (run 01_prepare_subject.sh)"
+[[ -f "$session_dir/brain.mgz" ]] || wmba_die "missing $session_dir/brain.mgz (run 01_prepare_subject.sh)"
 
-cp -f "$mid"/* "$scan_dir/surf/"
+cp -f "$mid"/* "$session_dir/surf/"
 
-wmba_log "surfreg pass 2: $subject/$scan $hemi lvl$level"
+wmba_log "surfreg pass 2: $subject/$session $hemi lvl$level"
 mris_register \
-  "$scan_dir/surf/$hemi.sphere" \
+  "$session_dir/surf/$hemi.sphere" \
   "$template" \
-  "$scan_dir/surf/$hemi.sphere.reg1"
+  "$session_dir/surf/$hemi.sphere.reg1"
 
 # --- resample onto the icosphere -------------------------------------------
 # mri_surf2surf carries the mid-surface's own xyz coordinates through the
@@ -38,8 +38,8 @@ mris_register \
 # --sval-xyz/--tval-xyz do the whole thing in one call: no per-axis overlays, no
 # separate topology file, no mesh reassembly.
 #
-# Layout note: the working tree is <data>/<subject>/<scan>/surf, so pointing
-# SUBJECTS_DIR at <data>/<subject> makes <scan> the "subject" as far as
+# Layout note: the working tree is <data>/<subject>/<session>/surf, so pointing
+# SUBJECTS_DIR at <data>/<subject> makes <session> the "subject" as far as
 # FreeSurfer is concerned, and no staging copy is needed.
 #
 # "ico" is special-cased inside mri_surf2surf: it loads
@@ -47,19 +47,19 @@ mris_register \
 # and no target registration are required.
 out="$mid/${hemi}_lvl${level}_ico_${WMBA_ICO_ORDER}"
 
-wmba_log "icosphere resample: $subject/$scan $hemi lvl$level -> order $WMBA_ICO_ORDER"
+wmba_log "icosphere resample: $subject/$session $hemi lvl$level -> order $WMBA_ICO_ORDER"
 SUBJECTS_DIR="$WMBA_DATA_DIR/$subject" \
 mri_surf2surf \
   --hemi "$hemi" \
-  --srcsubject "$scan" \
+  --srcsubject "$session" \
   --srcsurfreg "sphere.reg1" \
   --sval-xyz "lvl$level" \
   --trgsubject ico \
   --trgicoorder "$WMBA_ICO_ORDER" \
-  --tval-xyz "$scan_dir/brain.mgz" \
+  --tval-xyz "$session_dir/brain.mgz" \
   --tval "$out"
 
 [[ -s "$out" ]] || wmba_die "mri_surf2surf produced no output: $out"
 
-mv -f "$scan_dir/surf"/* "$mid/"
-mv -f "$mid"/*.lvl* "$scan_dir/surf/"
+mv -f "$session_dir/surf"/* "$mid/"
+mv -f "$mid"/*.lvl* "$session_dir/surf/"

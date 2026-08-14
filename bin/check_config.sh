@@ -46,7 +46,7 @@ head_ "Levels and hemispheres"
 validate_msg="$(wmba_validate_config 2>&1)"
 if [[ -z "$validate_msg" ]]; then
   n_lv=$(echo $WMBA_LEVELS | wc -w); n_h=$(echo $WMBA_HEMIS | wc -w)
-  ok "WMBA_LEVELS='$WMBA_LEVELS'  WMBA_HEMIS='$WMBA_HEMIS'  -> $((n_lv*n_h)) features per scan"
+  ok "WMBA_LEVELS='$WMBA_LEVELS'  WMBA_HEMIS='$WMBA_HEMIS'  -> $((n_lv*n_h)) features per session"
 else
   # here-string, not a pipe: a pipe would run the loop in a subshell and the
   # failure counter would never reach the parent, breaking the exit code.

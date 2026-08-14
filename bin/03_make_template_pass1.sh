@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Stage 3 - seed the surface registration templates from a single subject.
 #
-#   bin/03_make_template_pass1.sh <hemi> [subject/scan]
+#   bin/03_make_template_pass1.sh <hemi> [subject/session]
 #
 # Writes : $WMBA_TEMPLATE_DIR/<hemi>lvl<level>.tif   for each level
 #
@@ -12,13 +12,13 @@
 # Original: II_MakeFirstTemp.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
-usage() { echo "usage: $(basename "$0") <hemi> [subject/scan]" >&2; exit 2; }
+usage() { echo "usage: $(basename "$0") <hemi> [subject/session]" >&2; exit 2; }
 [[ $# -ge 1 ]] || usage
 
 hemi="$1"
 seed="${2:-$WMBA_TEMPLATE_SEED}"
 
-[[ "$seed" == */* ]] || wmba_die "seed must be '<subject>/<scan>', got: $seed"
+[[ "$seed" == */* ]] || wmba_die "seed must be '<subject>/<session>', got: $seed"
 
 wmba_setup_freesurfer
 export SUBJECTS_DIR="$WMBA_DATA_DIR"
