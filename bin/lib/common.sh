@@ -60,27 +60,34 @@ if [[ -z "${WMBA_SKIP_VALIDATE:-}" ]]; then
 fi
 
 # Load the FreeSurfer environment. Idempotent.
+#
+# SetUpFreeSurfer.sh is neither -e nor -u clean: it reads unset variables, and it
+# runs commands that legitimately return non-zero (greps that find nothing). Both
+# options have to come off around the source, or the calling script dies inside
+# FreeSurfer's own setup with no useful message.
 wmba_setup_freesurfer() {
   [[ -d "${FREESURFER_HOME:-}" ]] || wmba_die "FREESURFER_HOME is not a directory: ${FREESURFER_HOME:-<unset>}"
   if [[ -z "${FREESURFER:-}" ]]; then
-    # FreeSurferEnv.sh is not -u clean.
-    set +u
+    set +eu
     # shellcheck source=/dev/null
-    source "$FREESURFER_HOME/SetUpFreeSurfer.sh" >/dev/null
-    set -u
+    source "$FREESURFER_HOME/SetUpFreeSurfer.sh" >/dev/null 2>&1
+    set -eu
   fi
+  command -v mri_convert >/dev/null 2>&1 || \
+    wmba_die "FreeSurfer environment did not load: mri_convert is not on PATH after sourcing $FREESURFER_HOME/SetUpFreeSurfer.sh"
   [[ -f "$FREESURFER_HOME/license.txt" || -n "${FS_LICENSE:-}" ]] || \
     wmba_die "FreeSurfer license not found. Put license.txt in \$FREESURFER_HOME or set \$FS_LICENSE."
 }
 
-# Load the FSL environment (needed only by 04_sampling.sh).
+# Load the FSL environment (needed only by 07_sampling.sh).
 wmba_setup_fsl() {
   [[ -d "${FSLDIR:-}" ]] || wmba_die "FSLDIR is not a directory: ${FSLDIR:-<unset>}"
   export FSLOUTPUTTYPE="${FSLOUTPUTTYPE:-NIFTI_GZ}"
-  set +u
+  # fsl.sh has the same problem as SetUpFreeSurfer.sh.
+  set +eu
   # shellcheck source=/dev/null
   source "$FSLDIR/etc/fslconf/fsl.sh"
-  set -u
+  set -eu
   export PATH="$FSLDIR/bin:$PATH"
 }
 
