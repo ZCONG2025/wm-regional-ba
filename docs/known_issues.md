@@ -1,5 +1,35 @@
 # Known issues
 
+## 0. The icosphere resampling was rewritten and needs verifying once
+
+Stage 06 used to resample surfaces through a MATLAB function that depended on an
+in-house toolbox. It is now a single `mri_surf2surf` call. The flags were checked
+against the `mri_surf2surf` source, but **the rewrite has not been run against
+real data** — it was written on a machine without FreeSurfer.
+
+Verify it once on a subject you have already processed the old way, before
+trusting it on a cohort:
+
+```bash
+bin/06_surfreg_pass2.sh SUBJ01 0 lh 4
+```
+
+```python
+import numpy as np, scipy.io, mne
+new, _ = mne.read_surface(".../midsurf/lvl4/lh_lvl4_ico_6")
+old = scipy.io.loadmat(".../midsurf/lvl4/lh_coord.mat")["coord"]
+print(new.shape, old.shape)                      # both (40962, 3)
+print(np.abs(new - old).max())                   # expect ~0
+```
+
+The two paths resample the same coordinates through the same registration onto
+the same icosahedron, so they should agree to within floating-point noise. A
+large disagreement means one of the assumptions above is wrong — please open an
+issue with the numbers.
+
+Old datasets are unaffected: `wmba.sampling` still reads `<hemi>_coord.mat` when
+the new surface file is absent.
+
 Things found while packaging the code that a user should know about before
 trusting the output. Nothing here was silently changed: where behaviour is in
 question, the original behaviour is still the default.
