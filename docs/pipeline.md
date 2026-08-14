@@ -56,7 +56,7 @@ white matter.
   05 make_template_pass2  cohort ► *_1.tif │
                    └──────────┬───────────┘
                               │
-  06 surfreg_pass2      ?h.sphere ► ?h.sphere.reg1, resample to icosphere
+  06 surfreg_pass2      ?h.sphere ► ?h.sphere.reg1, mri_surf2surf ► icosphere
   07 sampling           FLAIR ► <flair_id>_?h.txt        ◄── the output
                               │
   08 synthseg           optional, external tool, QC only

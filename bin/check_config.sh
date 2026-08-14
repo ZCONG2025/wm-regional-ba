@@ -59,7 +59,6 @@ fi
 head_ "Working directories"
 check_writable "data dir      (WMBA_DATA_DIR)"     "$WMBA_DATA_DIR"
 check_writable "template dir  (WMBA_TEMPLATE_DIR)" "$WMBA_TEMPLATE_DIR"
-check_writable "scratch dir   (WMBA_TMP_DIR)"      "$WMBA_TMP_DIR"
 check_writable "FreeSurfer out(WMBA_FS_DIR)"       "$WMBA_FS_DIR"
 check_dir      "T1 input dir  (WMBA_T1_DIR)"       "$WMBA_T1_DIR"
 check_dir      "FLAIR input   (WMBA_FLAIR_DIR)"    "$WMBA_FLAIR_DIR"
@@ -149,27 +148,6 @@ PY
     bad "cannot 'import wmba' -- run: pip install -e ."
   fi
 fi
-
-# ---------------------------------------------------------------------------
-head_ "MATLAB (stages 06 and 07)"
-if ! command -v "$WMBA_MATLAB" >/dev/null; then
-  bad "WMBA_MATLAB not on PATH: $WMBA_MATLAB"
-else
-  ok "matlab: $(command -v "$WMBA_MATLAB")"
-fi
-check_dir "MATLAB modules (WMBA_MATLAB_MODULES)" "$WMBA_MATLAB_MODULES"
-if [[ -d "${WMBA_MATLAB_MODULES:-}" ]]; then
-  for fn in SurfStatReadSurf1 read_surf write_curv read_curv \
-            freesurfer_read_tri writeObjMesh2 MeshNormal; do
-    if find "$WMBA_MATLAB_MODULES" -maxdepth 3 -name "$fn.m" -print -quit 2>/dev/null | grep -q .; then
-      ok "matlab function: $fn.m"
-    else
-      bad "matlab function not found under \$WMBA_MATLAB_MODULES: $fn.m"
-    fi
-  done
-fi
-check_file "mri_surf2ico (WMBA_SURF2ICO)" "$WMBA_SURF2ICO"
-check_file "icosphere template ic${WMBA_ICO_ORDER}.tri" "$WMBA_ICO_DIR/ic${WMBA_ICO_ORDER}.tri"
 
 # ---------------------------------------------------------------------------
 head_ "Template"

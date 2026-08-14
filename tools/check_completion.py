@@ -2,7 +2,7 @@
 """Report which subject / scan / level / hemisphere outputs are still missing.
 
     python tools/check_completion.py --flair-id I123456
-    python tools/check_completion.py --subjects subjects.tsv --stage obj
+    python tools/check_completion.py --subjects subjects.tsv --stage resampled
 
 Prints one line per incomplete scan, and a summary. Exit status is 1 if anything
 is missing, so it can gate a downstream step.
@@ -24,7 +24,7 @@ STAGES = {
     "surf": "surf/{hemi}.lvl{level}",
     "sphere": "midsurf/lvl{level}/{hemi}.sphere",
     "reg": "midsurf/lvl{level}/{hemi}.sphere.reg1",
-    "obj": "midsurf/lvl{level}/{hemi}_lvl{level}_ico_{order}.obj",
+    "resampled": "midsurf/lvl{level}/{hemi}_lvl{level}_ico_{order}",
     "feature": "midsurf/lvl{level}/{flair_id}_{hemi}.txt",
 }
 

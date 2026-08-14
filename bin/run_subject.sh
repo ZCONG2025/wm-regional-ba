@@ -43,7 +43,7 @@ for level in $WMBA_LEVELS; do
       "$WMBA_ROOT/bin/02_make_isosurf.sh" "$subject" "$scan" "$hemi" "$level"
     fi
 
-    if [[ ! -f "$mid/${hemi}_lvl${level}_ico_${WMBA_ICO_ORDER}.obj" ]]; then
+    if [[ ! -f "$mid/${hemi}_lvl${level}_ico_${WMBA_ICO_ORDER}" ]]; then
       "$WMBA_ROOT/bin/06_surfreg_pass2.sh" "$subject" "$scan" "$hemi" "$level"
     fi
 

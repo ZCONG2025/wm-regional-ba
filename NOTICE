@@ -45,38 +45,25 @@ Luke Polson's "Python Metaphysics Series", video 31:
 https://github.com/lukepolson/youtube_channel
 
 --------------------------------------------------------------------------------
-matlab/ResampleMesh2Icosphere_FreeSurfer.m -- PROVENANCE UNRESOLVED
+Icosphere resampling -- previously third-party, now reimplemented
 
-This function was inherited by the present author rather than written from
-scratch, and its original authorship is not settled. The evidence:
+Until v1.1 this pipeline resampled surfaces with
+matlab/ResampleMesh2Icosphere_FreeSurfer.m, which had been inherited rather than
+written here, and which depended on an in-house MATLAB toolbox
+(freesurfer_read_tri, writeObjMesh2, MeshNormal) and a mri_surf2ico.sh wrapper
+kept under .../shi/spectrum/jiazhang/Codes/ on the originating cluster. Its
+authorship was never established, and none of those helpers were publicly
+available, so the stage could not run outside that lab.
 
-  - the version it was adapted from carried no authorship header;
-  - it depended on a MATLAB toolbox and a shell wrapper kept under
-    .../shi/spectrum/jiazhang/Codes/ on the originating cluster
-    (Matlab_Modules/, Freesurfer_Scripts/mri_surf2ico.sh, ic<order>.tri);
-  - the driver script that called it passed seven arguments, while the copy in
-    hand takes eight -- the extra `scan` argument was added to fit this
-    project's <subject>/<scan>/surf layout. So a seven-argument original by
-    someone else almost certainly exists.
-
-ACTION REQUIRED: confirm with Jia Zhang (and the Shi lab, USC Stevens INI)
-who authored the original and under what terms it may be redistributed. If it
-is a third-party work, this file needs an attribution and copyright line here,
-and the licence must be checked for compatibility with GPL-3.0 -- as was
-necessary for Vox2Cortex above.
-
-The same conversation would settle whether freesurfer_read_tri, writeObjMesh2,
-MeshNormal and mri_surf2ico.sh may be included in this repository, which is
-currently the only thing preventing stage 06 from running outside the
-originating lab. See the "Known gap" note in README.md.
+That step is now a single call to FreeSurfer's own mri_surf2surf, written from
+its documented interface. No third-party code remains in it, and the MATLAB
+dependency is gone from the project entirely.
 
 --------------------------------------------------------------------------------
 External tools invoked but not distributed
 
   FreeSurfer   https://surfer.nmr.mgh.harvard.edu/     (own licence required)
   FSL          https://fsl.fmrib.ox.ac.uk/fsl/         (own licence required)
-  MATLAB       https://www.mathworks.com/              (own licence required)
-  SurfStat     https://math.mcgill.ca/keith/surfstat/
   SynthSeg     https://github.com/BBillot/SynthSeg     (optional)
 
 The two-pass surface template procedure follows FreeSurfer's documented recipe:

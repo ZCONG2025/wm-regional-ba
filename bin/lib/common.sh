@@ -94,10 +94,3 @@ wmba_require_cmd() {
   command -v "$1" >/dev/null 2>&1 || wmba_die "required command not on PATH: $1"
 }
 
-# Run MATLAB in batch mode on a snippet passed via stdin.
-wmba_matlab() {
-  wmba_require_cmd "$WMBA_MATLAB"
-  local mpath="$WMBA_ROOT/matlab:$WMBA_MATLAB_MODULES"
-  MATLABPATH="${mpath}${MATLABPATH:+:$MATLABPATH}" \
-    "$WMBA_MATLAB" -nodisplay -nosplash -nodesktop
-}

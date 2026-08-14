@@ -8,8 +8,6 @@
 #   FreeSurfer  - redistribution requires their licence; each user registers and
 #                 obtains their own license.txt (free for academic use).
 #   FSL         - licence prohibits redistribution to commercial users.
-#   MATLAB      - proprietary, needs a per-user licence server.
-#   SurfStat / mri_surf2ico.sh - third-party code that is not ours to ship.
 #
 # So this image is a reproducible Python environment, not a one-command
 # pipeline. See docs/docker.md for how to combine it with FreeSurfer's own

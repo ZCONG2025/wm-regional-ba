@@ -12,8 +12,6 @@ The rest is not:
 |---|---|
 | FreeSurfer | Redistribution needs Freesurfer's permission. Each user registers and gets their own `license.txt` (free for academic use). |
 | FSL | The FSL licence permits academic use but not redistribution to commercial users. |
-| MATLAB | Proprietary; needs a per-user licence server. |
-| SurfStat, `mri_surf2ico.sh` | Third-party academic code, not ours to ship. |
 
 So there is no single image that runs the whole pipeline end to end. Do not
 promise one in your paper.

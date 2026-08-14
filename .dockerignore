@@ -5,7 +5,6 @@ logs/
 data/
 srcs/
 docs/
-matlab/
 config/config.sh
 **/__pycache__/
 *.egg-info/

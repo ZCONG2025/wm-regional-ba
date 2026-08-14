@@ -1,8 +1,12 @@
 """Sample FLAIR intensity at every vertex of an icosphere-resampled mid-surface.
 
-Input is `<hemi>_coord.mat` (written by matlab/obj_convert.m), holding the mesh
-vertex coordinates in FreeSurfer voxel space. Output is one intensity per vertex,
+Input is the icosphere-resampled surface written by stage 06, a FreeSurfer binary
+surface named `<hemi>_lvl<level>_ico_<order>`. Output is one intensity per vertex,
 in the icosphere vertex order, so values are directly comparable across subjects.
+
+Datasets produced before stage 06 was rewritten hold `<hemi>_coord.mat` instead,
+written from an `.obj` by a MATLAB step that no longer exists. Those are still
+read, so old and new runs stay comparable.
 
 Intensities are divided by the volume maximum, which makes them comparable across
 scanners only to the extent that the FLAIR intensity range is comparable. If you
@@ -15,6 +19,9 @@ from __future__ import annotations
 
 import argparse
 
+import os
+
+import mne
 import nibabel as nib
 import numpy as np
 import scipy.io
@@ -35,13 +42,37 @@ def _sample(volume: torch.Tensor, vertices: torch.Tensor, shape, mode: str):
     return aggregate_from_indices((volume,), grid, range(1), mode=mode).view(n_verts)
 
 
+def load_vertices(mid_dir, hemi: str, level: int, order: str | int | None = None) -> np.ndarray:
+    """Vertex coordinates of the icosphere-resampled mid-surface, as (N, 3).
+
+    Prefers the FreeSurfer surface written by stage 06; falls back to the
+    `<hemi>_coord.mat` produced by the retired MATLAB step.
+    """
+    if order is None:
+        order = os.environ.get("WMBA_ICO_ORDER", "6")
+
+    surf_path = mid_dir / f"{hemi}_lvl{level}_ico_{order}"
+    if surf_path.is_file():
+        verts, _faces = mne.read_surface(str(surf_path))
+        return np.asarray(verts, dtype=np.float64)
+
+    legacy = mid_dir / f"{hemi}_coord.mat"
+    if legacy.is_file():
+        return np.asarray(scipy.io.loadmat(str(legacy))["coord"], dtype=np.float64)
+
+    raise SystemExit(
+        f"no resampled surface for {hemi} lvl{level}: expected {surf_path} "
+        f"(or the legacy {legacy}). Run bin/06_surfreg_pass2.sh first."
+    )
+
+
 def sample(scan_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "legacy") -> str:
     flair_path = scan_dir / f"{flair_id}_FLAIR_converted.nii.gz"
     aseg_path = scan_dir / "aseg.mgz"
-    coord_path = scan_dir / "midsurf" / f"lvl{level}" / f"{hemi}_coord.mat"
-    for p in (flair_path, aseg_path, coord_path):
+    for p in (flair_path, aseg_path):
         if not p.is_file():
             raise SystemExit(f"missing input: {p}")
+    mid_dir = scan_dir / "midsurf" / f"lvl{level}"
 
     flair_img = nib.load(str(flair_path))
     flair = flair_img.get_fdata()
@@ -55,7 +86,7 @@ def sample(scan_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "leg
             "the FLAIR must be resampled to the conformed T1 (stage 07)."
         )
 
-    verts = torch.FloatTensor(scipy.io.loadmat(str(coord_path))["coord"]).view(-1, 3)
+    verts = torch.FloatTensor(load_vertices(mid_dir, hemi, level)).view(-1, 3)
 
     flair_t = torch.FloatTensor(flair).view(1, 1, *shape)
     flair_t = flair_t / torch.max(flair_t)
@@ -72,7 +103,7 @@ def sample(scan_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "leg
         # docs/known_issues.md. Kept as the default so results reproduce.
         print("BGIT mask: disabled (legacy behaviour), no vertices excluded")
 
-    out_path = scan_dir / "midsurf" / f"lvl{level}" / f"{flair_id}_{hemi}.txt"
+    out_path = mid_dir / f"{flair_id}_{hemi}.txt"
     np.savetxt(str(out_path), features)
     return str(out_path)
 

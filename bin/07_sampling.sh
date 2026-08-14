@@ -40,14 +40,8 @@ if [[ ! -f "$flair_reg" ]]; then
     -omat "$scan_dir/${flair_id}_flair_trans_converted.mat"
 fi
 
-# --- surface coordinates: .obj -> .mat -------------------------------------
-wmba_log "obj -> coord.mat (MATLAB): $subject/$scan $hemi lvl$level"
-wmba_matlab <<EOF
-obj_convert('$scan_dir', '$subject', '$level', '$hemi');
-exit;
-EOF
-
 # --- sample -----------------------------------------------------------------
+# Vertex coordinates are read straight from the surface written by stage 06.
 wmba_log "sampling: $subject/$scan $hemi lvl$level $flair_id"
 "$WMBA_PYTHON" -m wmba.sampling \
   --subject "$subject" --scan "$scan" --hemi "$hemi" \

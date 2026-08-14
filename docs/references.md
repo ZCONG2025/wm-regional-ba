@@ -46,7 +46,7 @@ feature-aggregation utilities. This is also why this repository is GPL-3.0 — s
 
 | Used for | Cite |
 |---|---|
-| `recon-all`, surface inflation, `mris_register`, `mris_make_template` | Fischl 2012 |
+| `recon-all`, surface inflation, `mris_register`, `mris_make_template`, `mri_surf2surf` | Fischl 2012 |
 | FLAIR skull-stripping (`bet`) | Smith 2002 |
 | FLAIR-to-T1 registration (`flirt`) | Jenkinson & Smith 2001; Jenkinson et al. 2002 |
 | the FSL suite as a whole | Jenkinson et al. 2012 |
@@ -57,7 +57,6 @@ feature-aggregation utilities. This is also why this repository is GPL-3.0 — s
 | array handling throughout | Harris et al. 2020 (NumPy) |
 | mesh voxelisation | trimesh |
 | vertex-wise volume sampling (`grid_sample`) | Paszke et al. 2019 (PyTorch) |
-| reading `.obj` surfaces in MATLAB | Worsley et al. 2009 (SurfStat) |
 | DICOM to NIfTI conversion (`tools/`) | Lowekamp et al. 2013 (SimpleITK) |
 | optional segmentation stage | Billot et al. 2023 (SynthSeg) |
 
@@ -234,21 +233,6 @@ so do not copy an older paper's version.
   booktitle = {Advances in Neural Information Processing Systems 32 (NeurIPS)},
   year      = {2019},
   pages     = {8024--8035}
-}
-
-@article{Worsley2009SurfStat,
-  author  = {Worsley, Keith J. and Taylor, Jonathan E. and Carbonell, Felix and
-             Chung, Moo K. and Duerden, Emma and Bernhardt, Boris and
-             Lyttelton, Oliver and Boucher, Maxime and Evans, Alan C.},
-  title   = {{SurfStat}: A {Matlab} toolbox for the statistical analysis of
-             univariate and multivariate surface and volumetric data using
-             linear mixed effects models and random field theory},
-  journal = {NeuroImage},
-  volume  = {47},
-  number  = {Supplement 1},
-  pages   = {S102},
-  year    = {2009},
-  doi     = {10.1016/S1053-8119(09)70882-1}
 }
 
 @article{Lowekamp2013SimpleITK,

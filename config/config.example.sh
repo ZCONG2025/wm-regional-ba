@@ -18,8 +18,6 @@ export WMBA_ROOT
 export WMBA_DATA_DIR="${WMBA_DATA_DIR:-$WMBA_ROOT/work/data}"
 # Surface templates (?hlvl?.tif, ?hlvl?_1.tif) produced by bin/02_*
 export WMBA_TEMPLATE_DIR="${WMBA_TEMPLATE_DIR:-$WMBA_ROOT/work/template}"
-# Scratch space used by the MATLAB icosphere resampling step
-export WMBA_TMP_DIR="${WMBA_TMP_DIR:-$WMBA_ROOT/work/tmp}"
 # Directory holding the raw FLAIR NIfTIs, named <image_id>.nii.gz
 export WMBA_FLAIR_DIR="${WMBA_FLAIR_DIR:-$WMBA_ROOT/work/flair}"
 # Directory holding the raw T1 NIfTIs, named <image_id>.nii.gz
@@ -40,6 +38,8 @@ export WMBA_LEVELS="${WMBA_LEVELS:-1 2 3 4 5 6 7 8}"
 # Both hemispheres. Only lh and rh are valid.
 export WMBA_HEMIS="${WMBA_HEMIS:-lh rh}"
 # Icosphere subdivision order. 6 -> 40962 vertices per hemisphere.
+# mri_surf2surf reads the icosahedron from $FREESURFER_HOME/lib/bem/ic<order>.tri,
+# which ships with FreeSurfer -- nothing extra to install.
 export WMBA_ICO_ORDER="${WMBA_ICO_ORDER:-6}"
 # Subject used to seed the first-pass surface template (bin/02_make_template_pass1.sh)
 export WMBA_TEMPLATE_SEED="${WMBA_TEMPLATE_SEED:-SUBJECT_ID/0}"
@@ -64,17 +64,6 @@ export FSLOUTPUTTYPE="${FSLOUTPUTTYPE:-NIFTI_GZ}"
 # Python interpreter that has the packages in requirements.txt installed.
 # e.g. /path/to/conda/envs/wmba/bin/python
 export WMBA_PYTHON="${WMBA_PYTHON:-python}"
-
-# --- MATLAB ----------------------------------------------------------------
-export WMBA_MATLAB="${WMBA_MATLAB:-matlab}"
-# Directory containing SurfStat + the FreeSurfer MATLAB helpers
-# (SurfStatReadSurf1, read_surf, write_curv, read_curv, freesurfer_read_tri,
-#  writeObjMesh2, MeshNormal).
-export WMBA_MATLAB_MODULES="${WMBA_MATLAB_MODULES:-/path/to/matlab_modules}"
-# Directory containing the icosphere templates ic<order>.tri
-export WMBA_ICO_DIR="${WMBA_ICO_DIR:-/path/to/freesurfer_scripts}"
-# Path to the mri_surf2ico.sh wrapper
-export WMBA_SURF2ICO="${WMBA_SURF2ICO:-/path/to/freesurfer_scripts/mri_surf2ico.sh}"
 
 # --- optional: SynthSeg ----------------------------------------------------
 # Only used by bin/08_synthseg.sh, which produces a segmentation for QC. Nothing

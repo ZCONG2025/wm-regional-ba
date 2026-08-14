@@ -7,7 +7,7 @@
 # format the pipeline expects.
 #
 # See the README "Requirements" section for what each one is used by, and for the
-# external software (FreeSurfer, FSL, MATLAB) that is NOT installable from here.
+# external software (FreeSurfer, FSL) that is NOT installable from here.
 
 # https://numpy.org/install/
 # Used everywhere. <2.0 because the pinned torch/scipy builds predate the NumPy 2 ABI.
@@ -15,7 +15,7 @@ numpy>=1.24,<2.0
 
 # https://scipy.org/install/
 # laplacian.py: ndimage.convolve for the Jacobi sweep, generate_binary_structure
-# sampling.py:  io.loadmat for the surface coordinates written by MATLAB
+# sampling.py:  io.loadmat, only to read coordinates from pre-rewrite datasets
 scipy>=1.10
 
 # https://nipy.org/nibabel/installation.html
@@ -23,7 +23,7 @@ scipy>=1.10
 nibabel>=5.0
 
 # https://mne.tools/stable/install/index.html
-# masking.py, marching_cube.py: read_surface / write_surface for FreeSurfer's
+# masking.py, marching_cube.py, sampling.py: read_surface / write_surface for FreeSurfer's
 # binary surface format, and transforms.apply_trans.
 # NOTE: a large dependency for surface I/O alone. nibabel.freesurfer.io offers
 # read_geometry/write_geometry as a lighter equivalent; swapping would need the
