@@ -95,22 +95,29 @@ Several stages copy a level's files into `<scan>/surf/`, run a FreeSurfer tool
 
 ## 4. The Laplace solver is CPU-bound and slow
 
-`wmba.laplacian` does up to 10000 Jacobi sweeps over a conformed 256³ volume with
-`scipy.ndimage.convolve`. Measured on one core: **~1.2 s per sweep, so ~3 h per
-hemisphere**, and it dominates the runtime of the whole pipeline.
+`wmba.laplacian` does Jacobi sweeps over a conformed 256³ volume with
+`scipy.ndimage.convolve`, and dominates the runtime of everything after
+`recon-all`.
 
-It does **not** converge to the default tolerance (5e-7) in practice — after 20
-sweeps the residual is still ~1e3, and the solve runs to the 10000-iteration cap.
-Budget accordingly rather than expecting early exit.
+Measured end to end on one subject (ADNI 002_S_4213, one core of an i5-4308U):
 
-`scipy.ndimage.convolve` is single-threaded, so extra cores do not help. The two
-hemispheres are independent (they share no scratch directory at this stage) and
-can safely run side by side.
+| | lh | rh |
+|---|---|---|
+| sweeps to converge | 1711 | 1728 |
+| final residual | 4.98e-07 | 4.97e-07 |
+| wall clock | 34 min 43 s | 34 min 59 s |
 
-A multigrid or conjugate-gradient solver would be far faster and is the obvious
-place to optimise. Until then, `--max-iters` is the honest knob: check how much
-the field still moves between, say, iteration 3000 and 10000 on one subject
-before deciding to cut it short on a cohort.
+So ~1.2 s per sweep and **~35 min per hemisphere**. It converges well inside the
+10000-sweep cap, so the cap is a backstop, not the expected exit. Convergence is
+not linear — the residual falls from ~1e3 at sweep 20 to 8.5e-02 at 500 and
+5e-04 at 1000 — so do not extrapolate the runtime from the first few sweeps.
+
+`scipy.ndimage.convolve` is single-threaded, so extra cores do not speed up one
+hemisphere. The two hemispheres share no scratch at this stage and were verified
+to run side by side at full speed.
+
+A multigrid or conjugate-gradient solver would still be far faster, and is the
+obvious place to optimise if this ever becomes the bottleneck for a large cohort.
 
 ## 5. Level 0 and level 9 are defined but unused
 
