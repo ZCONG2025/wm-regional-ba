@@ -84,7 +84,7 @@ overrides the file without editing it — useful for one-off runs and for cluste
 jobs:
 
 ```bash
-WMBA_DATA_DIR=/scratch/$USER/wmba bin/run_subject.sh SUBJ01 ...
+WMBA_DATA_DIR=/scratch/$USER/wmba bin/run_subject.sh SUBJ01 I123455 I123456 0
 ```
 
 ### What you must set
@@ -207,21 +207,22 @@ $WMBA_T1_DIR/I123455.nii.gz        T1-weighted, whole head, not skull-stripped
 $WMBA_FLAIR_DIR/I123456.nii.gz     FLAIR, same session
 ```
 
-The basenames are the "image ids" you pass on the command line. Any naming
-scheme works; the pipeline only needs the two files to exist where
-`config/config.sh` points.
+You pass the **basenames** on the command line — `I123455` and `I123456`, not
+paths. The pipeline appends `.nii.gz` and looks in `$WMBA_T1_DIR` and
+`$WMBA_FLAIR_DIR` respectively. Any naming scheme works; the two files just
+have to sit where `config/config.sh` points.
 
 ### One subject
 
 ```bash
-bin/run_subject.sh SUBJ01 "$WMBA_T1_DIR/I123455.nii.gz" I123456 0
+bin/run_subject.sh SUBJ01 I123455 I123456 0
 ```
 
 | position | value | meaning |
 |---|---|---|
 | 1 | `SUBJ01` | subject id — becomes the first output directory level |
-| 2 | `"$WMBA_T1_DIR/I123455.nii.gz"` | path to the T1 image |
-| 3 | `I123456` | FLAIR image id, i.e. its basename in `$WMBA_FLAIR_DIR` |
+| 2 | `I123455` | T1 image id — resolved as `$WMBA_T1_DIR/I123455.nii.gz` |
+| 3 | `I123456` | FLAIR image id — resolved as `$WMBA_FLAIR_DIR/I123456.nii.gz` |
 | 4 | `0` | **session number** — becomes the second output directory level |
 
 So that command writes to `$WMBA_DATA_DIR/SUBJ01/0/`. The session number says
@@ -230,7 +231,7 @@ this argument `scan`). Use `0` if you have one scan per subject; for longitudina
 data give each visit its own number:
 
 ```bash
-bin/run_subject.sh SUBJ01 "$WMBA_T1_DIR/I223455.nii.gz" I223456 1   # -> SUBJ01/1/
+bin/run_subject.sh SUBJ01 I223455 I223456 1     # -> SUBJ01/1/
 ```
 
 Sessions are processed independently and never share files, so they are safe to

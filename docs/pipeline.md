@@ -74,12 +74,14 @@ subjects against an existing template runs 00 → 02, then 06 → 07, which is w
 ### One subject, existing template
 
 ```bash
-bin/run_subject.sh SUBJ01 /path/to/T1.nii.gz I123456 0
+bin/run_subject.sh SUBJ01 I123455 I123456 0
 ```
 
-Arguments: subject id, T1 NIfTI, FLAIR image id (the basename in
-`$WMBA_FLAIR_DIR`), and scan/session id. Every step is skipped if its output
-exists, so rerunning after a failure resumes.
+Arguments: subject id, T1 image id, FLAIR image id, session number. The two
+image ids are basenames, resolved as `$WMBA_T1_DIR/<t1_id>.nii.gz` and
+`$WMBA_FLAIR_DIR/<flair_id>.nii.gz`; the session number becomes the second
+output directory level, so this writes to `$WMBA_DATA_DIR/SUBJ01/0/`. Every step
+is skipped if its output exists, so rerunning after a failure resumes.
 
 ### A cohort
 

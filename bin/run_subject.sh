@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # End-to-end driver for one subject against an EXISTING template.
 #
-#   bin/run_subject.sh <subject> <t1_nifti> <flair_id> [scan]
+#   bin/run_subject.sh <subject> <t1_id> <flair_id> [session]
+#
+# <t1_id> and <flair_id> are image identifiers, resolved as
+# $WMBA_T1_DIR/<t1_id>.nii.gz and $WMBA_FLAIR_DIR/<flair_id>.nii.gz.
 #
 # Runs, for every hemisphere in $WMBA_HEMIS and every level in $WMBA_LEVELS:
 #   00 recon-all -> 01 prepare -> 02 iso-surface -> 06 register + icosphere
@@ -16,14 +19,14 @@
 # Original: run1.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
-usage() { echo "usage: $(basename "$0") <subject> <t1_nifti> <flair_id> [scan]" >&2; exit 2; }
+usage() { echo "usage: $(basename "$0") <subject> <t1_id> <flair_id> [session]" >&2; exit 2; }
 [[ $# -ge 3 ]] || usage
 
-subject="$1"; t1_file="$2"; flair_id="$3"; scan="${4:-0}"
+subject="$1"; t1_id="$2"; flair_id="$3"; scan="${4:-0}"
 scan_dir="$(wmba_scan_dir "$subject" "$scan")"
 
 if [[ ! -f "$WMBA_FS_DIR/$subject/0/mri/aseg.mgz" ]]; then
-  "$WMBA_ROOT/bin/00_recon_all.sh" "$subject" "$t1_file"
+  "$WMBA_ROOT/bin/00_recon_all.sh" "$subject" "$t1_id"
 fi
 
 if [[ ! -f "$scan_dir/T1.nii.gz" ]]; then
