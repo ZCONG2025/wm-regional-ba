@@ -326,9 +326,10 @@ sites to be worth guessing at. Wrap it in whatever your cluster uses.
 
 Two rules matter when you do:
 
-- **Parallelise across subjects, never across levels or hemispheres within one
-  subject.** They share `<scan>/surf/` as scratch and will clobber each other —
-  see [`docs/known_issues.md`](docs/known_issues.md) §3.
+- **Parallelise across sessions, not inside one.** `run_subject.sh` already
+  runs the one parallelisable part for you — the Laplace solve, one process per
+  hemisphere. Everything after it shares `<session>/surf/` as scratch and is
+  serial by design.
 - **Give each task enough memory and wall time.** The Laplace solve holds several
   float64 copies of the conformed 256³ volume, so budget ~8–16 GB per task, and
   allow up to a day per scan. Every stage is single-threaded; extra cores buy

@@ -86,10 +86,14 @@ is skipped if its output exists, so rerunning after a failure resumes.
 ### A cohort
 
 Wrap `bin/run_subject.sh` in whatever your site's scheduler is; no submission
-scripts ship with this repository. Parallelise across subjects only, never across
-levels or hemispheres within a subject — see
-[`known_issues.md`](known_issues.md) §3. Budget ~8–16 GB and up to a day per
-scan, single-threaded.
+scripts ship with this repository. One job per session; budget ~8–16 GB and up to
+a day each.
+
+**Parallelise across sessions, not inside one.** `run_subject.sh` already runs
+the one part that parallelises — the Laplace solve, one process per hemisphere.
+Everything after it shares `<session>/surf/` as scratch and is deliberately
+serial, so running levels or hemispheres of the same session concurrently would
+have them overwrite each other.
 
 ## Obtaining a template
 
@@ -179,7 +183,7 @@ For the reference implementation the seed was one arbitrarily chosen subject,
 excluded from the second-pass cohort. The second pass then used **399**
 subjects — 400 were selected, and one was dropped because its first-pass
 registration failed. That attrition is normal; see
-[`known_issues.md`](known_issues.md) §6.
+[`known_issues.md`](known_issues.md) §7.
 
 A few hundred subjects is ample. More mostly costs runtime, and a subject whose
 pass-1 registration failed must be excluded, because a bad surface in the

@@ -39,6 +39,35 @@ if [[ ! -f "$session_dir/T1.nii.gz" ]]; then
   "$WMBA_ROOT/bin/01_prepare_subject.sh" "$subject" "$session"
 fi
 
+# --- Laplace solve, one process per hemisphere ------------------------------
+# This is the slow part (~35 min a hemisphere) and the only part that
+# parallelises: it is per hemisphere and writes only into mask/, so the two
+# hemispheres never touch the same file. Everything after this shares
+# <session>/surf/ as scratch and must stay serial.
+#
+# Set WMBA_PARALLEL_HEMIS=0 to run them one after the other instead — worth doing
+# on a memory-constrained node, since each process holds a few float64 copies of
+# the conformed volume (~0.5 GB per hemisphere).
+pids=(); solved=()
+for hemi in $WMBA_HEMIS; do
+  [[ -f "$session_dir/mask/lap_$hemi.nii" ]] && continue
+  if [[ "${WMBA_PARALLEL_HEMIS:-1}" == "1" ]]; then
+    "$WMBA_ROOT/bin/lib/mask_and_lap.sh" "$subject" "$session" "$hemi" &
+    pids+=("$!"); solved+=("$hemi")
+  else
+    "$WMBA_ROOT/bin/lib/mask_and_lap.sh" "$subject" "$session" "$hemi"
+  fi
+done
+if [[ ${#pids[@]} -gt 0 ]]; then
+  wmba_log "solving Laplace field for ${solved[*]} in parallel (${#pids[@]} processes)"
+  failed=""
+  for i in "${!pids[@]}"; do
+    wait "${pids[$i]}" || failed+=" ${solved[$i]}"
+  done
+  [[ -z "$failed" ]] || wmba_die "Laplace solve failed for:$failed (see the stage log above)"
+fi
+
+# --- everything below is serial: it shares <session>/surf/ ------------------
 for level in $WMBA_LEVELS; do
   mid="$session_dir/midsurf/lvl$level"
   for hemi in $WMBA_HEMIS; do

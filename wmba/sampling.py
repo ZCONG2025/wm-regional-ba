@@ -30,7 +30,21 @@ import torch
 from wmba.mesh_utils import aggregate_from_indices, normalize_vertices_flip
 from wmba.paths import add_common_args, resolve
 
-# aseg labels excluded from the surface feature: thalamus, caudate, putamen,
+# --- which aseg labels count as white matter -------------------------------
+# An inclusion list, not an exclusion list: a vertex is kept only if it lands on
+# a label named here, so a label nobody thought of cannot leak non-WM signal into
+# the feature. Everything else -- cortical grey matter, deep grey matter,
+# ventricles, CSF, unknown -- is zeroed.
+WM_LABELS = frozenset({
+    2, 41,                        # cerebral white matter, L / R
+    77,                           # WM hypointensities -- lesions are still WM,
+                                  # and they are what this pipeline measures
+    251, 252, 253, 254, 255,      # corpus callosum, posterior -> anterior
+    5001, 5002,                   # unsegmented WM, L / R (some FreeSurfer versions)
+})
+
+# The subcortical set the original code meant to exclude, kept so
+# --mask subcortical reproduces that intent exactly. Thalamus, caudate, putamen,
 # pallidum, accumbens, lateral ventricle, choroid plexus, hippocampus (L/R).
 BGIT_REGIONS = [10, 49, 13, 52, 12, 51, 11, 50, 26, 58, 4, 43, 31, 63, 17, 53]
 
@@ -66,7 +80,7 @@ def load_vertices(mid_dir, hemi: str, level: int, order: str | int | None = None
     )
 
 
-def sample(session_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "legacy") -> str:
+def sample(session_dir, hemi: str, level: int, flair_id: str, mask: str = "wm-only") -> str:
     flair_path = session_dir / f"{flair_id}_FLAIR_converted.nii.gz"
     aseg_path = session_dir / "aseg.mgz"
     for p in (flair_path, aseg_path):
@@ -92,16 +106,32 @@ def sample(session_dir, hemi: str, level: int, flair_id: str, bgit_mask: str = "
     flair_t = flair_t / torch.max(flair_t)
     features = _sample(flair_t, verts, shape, mode="trilinear").numpy()
 
-    if bgit_mask == "fixed":
+    if mask != "none":
+        # Nearest neighbour, never interpolation: an interpolated label is a
+        # number that names no structure.
         aseg_t = torch.FloatTensor(aseg).view(1, 1, *shape)
-        labels = _sample(aseg_t, verts, shape, mode="nearest").numpy()
-        excluded = np.isin(np.rint(labels).astype(np.int64), BGIT_REGIONS)
-        features[excluded] = 0
-        print(f"BGIT mask: zeroed {int(excluded.sum())} / {len(features)} vertices")
+        labels = np.rint(
+            _sample(aseg_t, verts, shape, mode="nearest").numpy()
+        ).astype(np.int64)
+
+        if mask == "wm-only":
+            keep = np.isin(labels, list(WM_LABELS))
+            features[~keep] = 0
+            n_zeroed = int((~keep).sum())
+            label_counts = np.unique(labels[~keep], return_counts=True)
+            top = sorted(zip(*label_counts), key=lambda kv: -kv[1])[:3]
+            detail = ", ".join(f"label {int(l)}×{int(c)}" for l, c in top)
+            print(
+                f"mask=wm-only: zeroed {n_zeroed} / {len(features)} vertices "
+                f"({100 * n_zeroed / len(features):.1f}%)"
+                + (f" — most common: {detail}" if top else "")
+            )
+        else:  # subcortical
+            excluded = np.isin(labels, BGIT_REGIONS)
+            features[excluded] = 0
+            print(f"mask=subcortical: zeroed {int(excluded.sum())} / {len(features)} vertices")
     else:
-        # The original code's exclusion step silently did nothing; see
-        # docs/known_issues.md. Kept as the default so results reproduce.
-        print("BGIT mask: disabled (legacy behaviour), no vertices excluded")
+        print("mask=none: no vertices excluded (reproduces the original behaviour)")
 
     out_path = mid_dir / f"{flair_id}_{hemi}.txt"
     np.savetxt(str(out_path), features)
@@ -116,19 +146,21 @@ def main() -> None:
     parser.add_argument("--level", type=int, required=True)
     parser.add_argument("--flair", required=True, help="FLAIR image identifier")
     parser.add_argument(
-        "--bgit-mask",
-        choices=["legacy", "fixed"],
-        default="legacy",
+        "--mask",
+        choices=["wm-only", "subcortical", "none"],
+        default="wm-only",
         help=(
-            "'legacy' (default) reproduces the published behaviour, in which no "
-            "vertices are excluded. 'fixed' actually zeroes vertices falling in "
-            "subcortical structures. See docs/known_issues.md."
+            "which vertices to zero. 'wm-only' (default) keeps only vertices "
+            "whose aseg label is white matter and zeroes everything else, "
+            "including cortical and deep grey matter. 'subcortical' zeroes only "
+            "the deep grey structures. 'none' zeroes nothing, reproducing the "
+            "original behaviour. See docs/known_issues.md."
         ),
     )
     args = parser.parse_args()
 
     session_dir = resolve(args)
-    print(sample(session_dir, args.hemi, args.level, args.flair, args.bgit_mask))
+    print(sample(session_dir, args.hemi, args.level, args.flair, args.mask))
 
 
 if __name__ == "__main__":

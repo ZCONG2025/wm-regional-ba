@@ -1,6 +1,10 @@
 # Known issues
 
-## 0. The icosphere resampling was rewritten — verified, but not against the old output
+Things found while packaging the code that a user should know about before
+trusting the output. Where a defect was fixed in a way that changes results, the
+old behaviour is still reachable by flag and the change is called out — see §1.
+
+## 1. The icosphere resampling was rewritten — verified, but not against the old output
 
 Stage 06 used to resample surfaces through a MATLAB function that depended on an
 in-house toolbox. It is now a single `mri_surf2surf` call.
@@ -36,15 +40,10 @@ issue if they do not.
 Old datasets are unaffected either way: `wmba.sampling` still reads
 `<hemi>_coord.mat` when the new surface file is absent.
 
-Things found while packaging the code that a user should know about before
-trusting the output. Nothing here was silently changed: where behaviour is in
-question, the original behaviour is still the default.
+## 2. Vertices are restricted to white matter, and the original code did not do this
 
-## 1. Subcortical ("BGIT") masking never took effect
-
-`sampling.py` intended to zero out surface vertices that fall inside subcortical
-structures (thalamus, caudate, putamen, pallidum, accumbens, lateral ventricle,
-choroid plexus, hippocampus). The original code was:
+`sampling.py` intended to zero surface vertices falling in subcortical grey
+matter. The original code was:
 
 ```python
 is_BGIT = torch.zeros((40962,))
@@ -55,28 +54,33 @@ features[ind_BGIT] = 0
 ```
 
 `is_BGIT` is 1-D of length 40962, so `.any(dim=0)` reduces it to a **single
-scalar**, not a per-vertex mask. `.nonzero()` on a 0-dim tensor yields an index
-array of shape `(n, 0)`, and assigning through it selects nothing. **No vertices
-were ever zeroed.**
+scalar**, not a per-vertex mask, and assigning through the resulting index array
+selects nothing. **No vertices were ever zeroed.** A second defect compounded it:
+the label map was sampled with `mode='nearest'`, but `aggregate_from_indices`
+ignored its `mode` argument and always interpolated, so the "labels" it compared
+against were numbers naming no structure.
 
-A second problem compounded it: the label map was sampled with
-`sampling(..., 'nearest')`, but `aggregate_from_indices` ignored its `mode`
-argument and always used bilinear interpolation. Interpolating integer aseg
-labels produces values that match no label, so even a correct index expression
-would have matched almost nothing.
+**What this repository does now.** `wmba.sampling` takes `--mask`:
 
-**What this repository does.** `wmba.sampling` takes `--bgit-mask`:
+| value | behaviour |
+|---|---|
+| `wm-only` (**default**) | keep a vertex only if its aseg label is white matter — `2`, `41`, `77` (WM hypointensities), `251`–`255` (corpus callosum), `5001`/`5002`. Zero everything else, cortical and deep grey matter included. |
+| `subcortical` | zero only the deep grey structures the original code listed |
+| `none` | zero nothing — reproduces the behaviour that produced the published features |
 
-- `legacy` (**default**) — no vertices are excluded. This reproduces the
-  behaviour that produced the published features.
-- `fixed` — samples the aseg with genuine nearest-neighbour interpolation and
-  zeroes vertices whose label is in `BGIT_REGIONS`.
+`wm-only` is an **inclusion** list on purpose. An exclusion list silently admits
+any label nobody thought to name; an inclusion list cannot. WM hypointensities
+(`77`) are deliberately kept — a lesion is still white matter, and lesions are
+what this pipeline is built to measure.
 
-If you are extending previously computed results, keep `legacy` so old and new
-features remain comparable. If you are starting a new analysis, `fixed` is what
-the code was meant to do. Do not mix the two within one dataset.
+The label map is sampled with genuine nearest-neighbour interpolation, which the
+original code did not do.
 
-## 2. The FLAIR intensity scale is only weakly harmonised
+**This changes the features.** Datasets built before this change used no masking
+at all. Do not mix `--mask` settings within one analysis, and use `none` if you
+are extending results produced by the original code.
+
+## 3. The FLAIR intensity scale is only weakly harmonised
 
 Features are FLAIR intensity divided by the volume maximum
 (`flair / torch.max(flair)`). A single bright artifact voxel rescales the whole
@@ -85,7 +89,7 @@ when a downstream model regresses within-subject or z-scores per site; it is not
 adequate as an absolute intensity measure. Consider a percentile-based
 normalisation or white-stripe normalisation if you need cross-site comparability.
 
-## 2b. Notes for running under WSL on Windows
+## 4. Notes for running under WSL on Windows
 
 FreeSurfer needs Linux; on Windows that means WSL. A few things cost time to
 discover:
@@ -112,21 +116,7 @@ discover:
   pair it with `OMP_NUM_THREADS=1` so the two runtimes cannot contend for
   threads. Linux installs do not hit this.
 
-## 3. `surf/` is used as a shared scratch directory
-
-Several stages copy a level's files into `<scan>/surf/`, run a FreeSurfer tool
-(which only reads from `surf/`), then move everything back into
-`<scan>/midsurf/lvl<N>/`. Consequences:
-
-- **Two levels of the same scan must not run concurrently.** They will clobber
-  each other's `surf/` contents. Parallelise across subjects, never across
-  levels within a subject.
-- If a stage dies midway, `surf/` can be left holding another level's files.
-  `bin/run_subject.sh` is resume-safe against missing outputs, but not against
-  this. When a scan behaves strangely, delete `<scan>/surf/` and
-  `<scan>/midsurf/` and rerun that scan from stage 02.
-
-## 4. The Laplace solver is CPU-bound and slow
+## 5. The Laplace solver is CPU-bound and slow
 
 `wmba.laplacian` does Jacobi sweeps over a conformed 256³ volume with
 `scipy.ndimage.convolve`, and dominates the runtime of everything after
@@ -152,14 +142,14 @@ to run side by side at full speed.
 A multigrid or conjugate-gradient solver would still be far faster, and is the
 obvious place to optimise if this ever becomes the bottleneck for a large cohort.
 
-## 5. Level 0 and level 9 are defined but unused
+## 6. Level 0 and level 9 are defined but unused
 
 `LAP_VAL` in `wmba/marching_cube.py` has ten entries; the default
 `WMBA_LEVELS` uses 1–8. Level 0 (iso-value 9998.5) sits essentially on the WM
 surface and its marching-cubes output is often degenerate; level 9 (3000) runs
 into the ventricle. Both are kept for reference but are not recommended.
 
-## 6. `mris_sphere` fails on some subjects
+## 7. `mris_sphere` fails on some subjects
 
 Inflating and spherically parameterising an iso-potential surface is harder than
 doing it for a cortical surface: the surfaces can self-intersect after marching
