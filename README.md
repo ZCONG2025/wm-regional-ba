@@ -217,7 +217,24 @@ scheme works; the pipeline only needs the two files to exist where
 bin/run_subject.sh SUBJ01 "$WMBA_T1_DIR/I123455.nii.gz" I123456 0
 ```
 
-Arguments: subject id, T1 file, FLAIR image id, scan/session id.
+| position | value | meaning |
+|---|---|---|
+| 1 | `SUBJ01` | subject id — becomes the first output directory level |
+| 2 | `"$WMBA_T1_DIR/I123455.nii.gz"` | path to the T1 image |
+| 3 | `I123456` | FLAIR image id, i.e. its basename in `$WMBA_FLAIR_DIR` |
+| 4 | `0` | **session number** — becomes the second output directory level |
+
+So that command writes to `$WMBA_DATA_DIR/SUBJ01/0/`. The session number says
+which timepoint this scan is for that subject (the scripts' usage strings call
+this argument `scan`). Use `0` if you have one scan per subject; for longitudinal
+data give each visit its own number:
+
+```bash
+bin/run_subject.sh SUBJ01 "$WMBA_T1_DIR/I223455.nii.gz" I223456 1   # -> SUBJ01/1/
+```
+
+Sessions are processed independently and never share files, so they are safe to
+run in parallel.
 
 That one command runs the whole chain — FreeSurfer `recon-all`, the Laplace
 solve, eight iso-surfaces per hemisphere, spherical registration to the
@@ -237,7 +254,7 @@ and run side by side at full speed.
 ### What lands on disk
 
 ```
-$WMBA_DATA_DIR/SUBJ01/0/
+$WMBA_DATA_DIR/SUBJ01/0/          <- <subject>/<session>
 ├── aseg.mgz  brain.mgz  lh.white  rh.white     staged from FreeSurfer
 ├── T1.nii.gz                                   conformed, skull-stripped
 ├── I123456_FLAIR_converted.nii.gz              FLAIR aligned to the T1
