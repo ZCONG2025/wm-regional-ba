@@ -1,34 +1,40 @@
 # Known issues
 
-## 0. The icosphere resampling was rewritten and needs verifying once
+## 0. The icosphere resampling was rewritten — verified, but not against the old output
 
 Stage 06 used to resample surfaces through a MATLAB function that depended on an
-in-house toolbox. It is now a single `mri_surf2surf` call. The flags were checked
-against the `mri_surf2surf` source, but **the rewrite has not been run against
-real data** — it was written on a machine without FreeSurfer.
+in-house toolbox. It is now a single `mri_surf2surf` call.
 
-Verify it once on a subject you have already processed the old way, before
-trusting it on a cohort:
+**Verified end to end** on ADNI 002_S_4213 (lh, level 4) with FreeSurfer 7.4.1:
 
-```bash
-bin/06_surfreg_pass2.sh SUBJ01 0 lh 4
-```
+| check | result |
+|---|---|
+| all eight flags exist in 7.4.1 | yes, semantics as documented |
+| `ico` target resolves without an `ico` subject dir | yes — reads `$FREESURFER_HOME/lib/bem/ic6.tri` |
+| vertices / faces out | 40 962 / 81 920 |
+| source vertices lost | `nSrcLost = 0` |
+| enclosed volume, source → resampled | 113.2 cm³ → 113.2 cm³ |
+
+The volume being unchanged is the meaningful one: resampling changed the vertex
+sampling and topology without distorting the geometry, which is exactly its job.
+
+**Still unverified:** agreement with the *old MATLAB path*, vertex for vertex. No
+dataset processed the old way was available to compare against. If you have one,
+this is worth five minutes:
 
 ```python
 import numpy as np, scipy.io, mne
 new, _ = mne.read_surface(".../midsurf/lvl4/lh_lvl4_ico_6")
 old = scipy.io.loadmat(".../midsurf/lvl4/lh_coord.mat")["coord"]
-print(new.shape, old.shape)                      # both (40962, 3)
-print(np.abs(new - old).max())                   # expect ~0
+print(new.shape, old.shape, np.abs(new - old).max())   # expect (40962,3) twice, ~0
 ```
 
-The two paths resample the same coordinates through the same registration onto
-the same icosahedron, so they should agree to within floating-point noise. A
-large disagreement means one of the assumptions above is wrong — please open an
-issue with the numbers.
+Both paths resample the same coordinates through the same registration onto the
+same icosahedron, so they should agree to floating-point noise. Please open an
+issue if they do not.
 
-Old datasets are unaffected: `wmba.sampling` still reads `<hemi>_coord.mat` when
-the new surface file is absent.
+Old datasets are unaffected either way: `wmba.sampling` still reads
+`<hemi>_coord.mat` when the new surface file is absent.
 
 Things found while packaging the code that a user should know about before
 trusting the output. Nothing here was silently changed: where behaviour is in
