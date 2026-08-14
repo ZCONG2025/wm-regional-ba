@@ -79,6 +79,33 @@ when a downstream model regresses within-subject or z-scores per site; it is not
 adequate as an absolute intensity measure. Consider a percentile-based
 normalisation or white-stripe normalisation if you need cross-site comparability.
 
+## 2b. Notes for running under WSL on Windows
+
+FreeSurfer needs Linux; on Windows that means WSL. A few things cost time to
+discover:
+
+- **WSL1 is the better choice here, not a fallback.** WSL2 needs hardware
+  virtualisation (unavailable on some machines, including Boot Camp Macs where
+  the EFI exposes no toggle) and its `/mnt/c` I/O is slow. WSL1 needs no
+  virtualisation and accesses Windows files at native speed — and this pipeline's
+  inputs usually live on the Windows side. Set `wsl --set-default-version 1`
+  *before* registering a distribution.
+- **Ubuntu 24.04 renamed packages.** The 64-bit `time_t` transition means
+  `libxt6` is now `libxt6t64`, and FreeSurfer's official `.deb` is built for
+  Ubuntu 22, so its declared dependencies may not resolve. If `apt-get install
+  ./freesurfer_*.deb` refuses, `dpkg -x` the archive instead — FreeSurfer's
+  binaries are largely self-contained.
+- **Background jobs die when the WSL session ends.** `nohup ... &` inside a
+  `wsl.exe -e bash -c` call is killed when that call returns, because WSL tears
+  the distribution down once its last process exits. Keep the `wsl.exe` process
+  itself in the foreground for the duration of any long job.
+- **Prefer downloading to `/mnt/c`.** Files there survive a distribution reset
+  and are visible from both sides.
+- **`OMP: Error #15`** on conda Python: conda's MKL and pip's torch each ship an
+  OpenMP runtime. `KMP_DUPLICATE_LIB_OK=TRUE` alone is documented as unsafe;
+  pair it with `OMP_NUM_THREADS=1` so the two runtimes cannot contend for
+  threads. Linux installs do not hit this.
+
 ## 3. `surf/` is used as a shared scratch directory
 
 Several stages copy a level's files into `<scan>/surf/`, run a FreeSurfer tool
