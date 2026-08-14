@@ -144,13 +144,33 @@ in the road:
 
 | | Do this | Cost |
 |---|---|---|
-| **A. Use an existing template** | `bin/install_template.sh <dir-or-archive>` | seconds |
-| **B. Build your own** | stages 03–05, see [`docs/pipeline.md`](docs/pipeline.md#building-a-template) | a few hundred subjects × ~a day each |
+| **A. Build one from your own cohort** — recommended | stages 03–05, see [`docs/pipeline.md`](docs/pipeline.md#building-a-template) | a few hundred subjects, one-off |
+| **B. Use the published ADNI template** | `bin/install_template.sh wmba-template-adni399.tar.gz` | seconds |
 
-**Option A is what you want unless you have a reason not to.** The template used
-for the reference analysis is published as a release asset — 16
-`<hemi>lvl<level>_1.tif` files (2 hemispheres × 8 levels), built from 399 ADNI
-subjects:
+> ### The published template is ADNI-specific, and its generalisation is unmeasured
+>
+> The template released here was built from **399 ADNI subjects** — an ageing,
+> memory-clinic cohort with substantial white-matter pathology. Whether it
+> transfers to a different population is **not something this project has
+> tested**, and no accuracy claim is made for it outside ADNI.
+>
+> Nothing will crash if you use it on another cohort. `mris_register` always
+> produces a registration; it does not fail when the match is poor. A degraded
+> template fit shows up not as an error but as noisier vertex correspondence, and
+> therefore as attenuated or biased downstream results — which is much harder to
+> notice.
+>
+> **Build a template from your own cohort** (option A) if you can. It is a
+> one-off cost and it removes the question entirely.
+>
+> If you do use the ADNI template on other data, treat it as an assumption to be
+> defended, not a given. A sensitivity analysis is the usual way: process a
+> subset both ways — ADNI template and cohort-specific template — and show the
+> downstream results do not materially differ. If they do, that is a finding, not
+> a failure.
+
+**Use the ADNI template (option B)** to reproduce the reference analysis, to try
+the pipeline out, or when your cohort genuinely resembles ADNI:
 
 ```bash
 curl -LO https://github.com/ZCONG2025/wm-regional-ba/releases/latest/download/wmba-template-adni399.tar.gz
@@ -158,28 +178,25 @@ bin/install_template.sh wmba-template-adni399.tar.gz
 bin/check_config.sh                                # confirms all 16 are present
 ```
 
-The installer verifies the whole set before copying anything, so an incomplete
-template fails immediately rather than three hours into a run, and it tells you
-if the template was built for a different set of levels than your
-`WMBA_LEVELS`. Template files are not in the repository itself — they are large
-binaries, and `.gitignore` blocks `*.tif` deliberately.
+16 `<hemi>lvl<level>_1.tif` files (2 hemispheres × 8 levels). The installer
+verifies the whole set before copying anything, so an incomplete template fails
+immediately rather than three hours into a run, and it tells you if the template
+was built for a different set of levels than your `WMBA_LEVELS`. Template files
+are not in the repository itself — they are large binaries, and `.gitignore`
+blocks `*.tif` deliberately.
 
-> **Input geometry.** The published template is intended for T1 images that are
-> **1 mm isotropic with whole-brain coverage** — the geometry of the UK Biobank
-> data the reference brain-age models were trained on. `recon-all` conforms any
-> input to 256³ at 1 mm, so the acquisition matrix does not have to match; what
-> matters is the voxel size and the coverage. Coarser or anisotropic data is
-> interpolated during conforming, which smooths the surfaces and shifts the
-> sampled FLAIR values; a truncated field of view truncates the white-matter
-> surface and degrades the registration. If your data differs materially on
-> either count, prefer option B.
+> **Input geometry** is a separate requirement, and it applies to any template.
+> T1 images should be **1 mm isotropic with whole-brain coverage**. `recon-all`
+> conforms any input to 256³ at 1 mm, so the acquisition matrix does not have to
+> match; what matters is the voxel size and the coverage. Coarser or anisotropic
+> data is interpolated during conforming, which smooths the surfaces and shifts
+> the sampled FLAIR values; a truncated field of view truncates the white-matter
+> surface and degrades the registration.
 
-**Build your own (option B) when:** your data is not 1 mm isotropic whole-brain;
-your cohort differs substantially in age, scanner or pathology from the template
-cohort; you changed `WMBA_LEVELS`; or you want the template derived from your own
-data for methodological reasons. Registering to a template built on a different
-population is usually fine — that is the point of a template — but it is a choice
-you should be able to defend.
+**Build your own (option A) whenever** your cohort differs from ADNI in age,
+scanner, or pathology; your data is not 1 mm isotropic whole-brain; you changed
+`WMBA_LEVELS`; or you simply want the template derived from the data you are
+analysing.
 
 ### What you need per scan
 

@@ -113,6 +113,15 @@ not needed to process subjects, and unlike a cohort average they carry one
 individual's folding pattern. Building your own template makes its own seed
 (stage 03).
 
+**Its generalisation beyond ADNI is unmeasured.** ADNI is an ageing,
+memory-clinic cohort with substantial white-matter pathology; a template is the
+average folding pattern of whatever cohort built it. Registering a different
+population to it will not fail — `mris_register` always returns a registration —
+but a poor fit degrades vertex correspondence silently, which propagates into
+attenuated or biased downstream results. Prefer [building your own](#building-a-template)
+when you can, and treat use of the ADNI template on other data as an assumption
+to defend rather than a default.
+
 `install_template.sh` verifies the whole set before copying anything, so an
 incomplete template fails immediately rather than three hours into a run. It also
 installs the first-pass `<hemi>lvl<level>.tif` files if the source has them —
