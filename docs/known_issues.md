@@ -95,12 +95,22 @@ Several stages copy a level's files into `<scan>/surf/`, run a FreeSurfer tool
 
 ## 4. The Laplace solver is CPU-bound and slow
 
-`wmba.laplacian` does up to 10000 Jacobi sweeps over a 256³ volume with
-`scipy.ndimage.convolve` — minutes to tens of minutes per hemisphere, and it
-dominates the runtime of the whole pipeline. It converges well before the
-iteration cap on most subjects; watch the printed error and lower `--max-iters`
-if you are confident. A multigrid or conjugate-gradient solver would be far
-faster and is the obvious place to optimise.
+`wmba.laplacian` does up to 10000 Jacobi sweeps over a conformed 256³ volume with
+`scipy.ndimage.convolve`. Measured on one core: **~1.2 s per sweep, so ~3 h per
+hemisphere**, and it dominates the runtime of the whole pipeline.
+
+It does **not** converge to the default tolerance (5e-7) in practice — after 20
+sweeps the residual is still ~1e3, and the solve runs to the 10000-iteration cap.
+Budget accordingly rather than expecting early exit.
+
+`scipy.ndimage.convolve` is single-threaded, so extra cores do not help. The two
+hemispheres are independent (they share no scratch directory at this stage) and
+can safely run side by side.
+
+A multigrid or conjugate-gradient solver would be far faster and is the obvious
+place to optimise. Until then, `--max-iters` is the honest knob: check how much
+the field still moves between, say, iteration 3000 and 10000 on one subject
+before deciding to cut it short on a cohort.
 
 ## 5. Level 0 and level 9 are defined but unused
 

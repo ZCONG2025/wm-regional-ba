@@ -207,9 +207,16 @@ solve, eight iso-surfaces per hemisphere, spherical registration to the
 template, icosphere resampling, FLAIR sampling. Steps whose output already
 exists are skipped, so rerunning after a failure resumes rather than restarts.
 
-**It is slow.** Roughly 8–14 h for `recon-all`, 10–40 min per hemisphere for the
+**It is slow.** Roughly 8–14 h for `recon-all`, **2–4 h per hemisphere** for the
 Laplace solve, and 5–20 min per level per hemisphere for the registration — on
 the order of a day per scan on one core. This is a cluster pipeline.
+
+The Laplace solve dominates and is the obvious thing to optimise. Measured at
+~1.2 s per Jacobi sweep over a conformed 256³ volume on one core, and it
+normally runs to the 10000-iteration cap rather than converging to the default
+tolerance, so budget the full ~3 h. It is single-threaded
+(`scipy.ndimage.convolve`), so extra cores do not help; the two hemispheres are
+independent and can run side by side.
 
 ### What lands on disk
 
