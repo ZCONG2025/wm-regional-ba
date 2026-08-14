@@ -33,6 +33,17 @@ the mid-surfaces rather than to the cortex (stages 03–06).
 > Mapping*. 1999;8(4):272–284.
 > doi:10.1002/(SICI)1097-0193(1999)8:4<272::AID-HBM10>3.0.CO;2-4
 
+**The gray matter workflow.** Panel C1 of the overview figure — cortical
+surfaces parcellated into Yeo functional networks, with vertex-wise thickness and
+GM/WM intensity ratio as features — follows the approach of Park et al. **It is
+not implemented in this repository**, which produces the white-matter features of
+panel C2 only.
+
+> Park G, et al. Associations between contralesional neuroplasticity and motor
+> impairment through deep learning-derived MRI regional brain age in chronic
+> stroke (ENIGMA): a multicohort, retrospective, observational study. *Lancet
+> Digital Health*. 2026;8:100942.
+
 **Vox2Cortex.** `wmba/mesh_utils.py` adapts its coordinate-transform and
 feature-aggregation utilities. This is also why this repository is GPL-3.0 — see
 [`NOTICE`](../NOTICE).
@@ -116,6 +127,18 @@ so do not copy an older paper's version.
   month     = {June},
   year      = {2022},
   pages     = {20773--20783}
+}
+
+@article{Park2026RegionalBrainAge,
+  author  = {Park, Gilsoon and others},
+  title   = {Associations between contralesional neuroplasticity and motor
+             impairment through deep learning-derived {MRI} regional brain age in
+             chronic stroke ({ENIGMA}): a multicohort, retrospective,
+             observational study},
+  journal = {The Lancet Digital Health},
+  volume  = {8},
+  pages   = {100942},
+  year    = {2026}
 }
 
 @article{Fischl2012FreeSurfer,

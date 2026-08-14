@@ -13,7 +13,44 @@ vector.
 Output per scan: 8 levels × 2 hemispheres × 40962 vertices, where vertex *i* at
 level *l* is the same white-matter location in every subject.
 
-![Eight nested iso-potential surfaces between the lateral ventricle and the WM/GM boundary, resampled onto a common icosphere](docs/figures/midsurfaces.svg)
+![Study workflow: paired T1 and T2-FLAIR MRI feeding parallel gray matter and white matter regional brain age models](docs/figures/pipeline-overview.png)
+
+**Paired T1-weighted and T2-FLAIR MRI scans were used to construct complementary
+gray matter (GM; blue workflow) and white matter (WM; yellow workflow) brain age
+models.**
+**B.** Preprocessing generated cortical surfaces from T1-weighted MRI,
+ventricular and WM masks from anatomical segmentation, and T2-FLAIR images
+registered to each participant's T1-weighted image.
+**C1.** GM regional features were extracted from cortical surfaces parcellated
+into functional networks, including sensorimotor, frontoparietal, dorsal
+attention, ventral attention/language, default mode, salience, auditory, visual
+and limbic regions defined by Yeo et al. Vertex-wise cortical thickness and GM/WM
+intensity ratio were used to generate regional GM feature matrices (e.g. visual
+network region).
+**C2.** WM regional features were generated using a Laplacian depth field
+spanning the GM–WM interface to the lateral ventricles. Eight internal WM
+surfaces were retained after excluding the cortical and ventricular boundary
+surfaces, and grouped into juxtacortical WM, deep WM and periventricular WM
+compartments. Each surface was further parcellated into frontal, parietal,
+temporal and occipital lobes, yielding 12 WM regions. The normalized T2-FLAIR
+signal was interpolated at corresponding surface vertices to generate regional WM
+feature matrices (e.g. occipital jxWM).
+**D.** Regional GM and WM feature matrices were entered into graph convolutional
+network models, in which surface vertices were represented as graph nodes and
+mesh adjacency as graph edges. Each regional model predicted brain age (BA), and
+regional brain age gap (BAG) was calculated as predicted brain age minus
+chronological age (BA − CA = BAG). Regional BAG maps were then used as tissue-
+and region-specific brain age indices for downstream analyses.
+
+*Abbreviations:* BA, brain age; BAG, brain age gap; CA, chronological age; FPN,
+frontoparietal network; GM, gray matter; jxWM, juxtacortical white matter; dWM,
+deep white matter; pvWM, periventricular white matter; WM, white matter.
+
+> **This repository implements the WM workflow — panel C2, the yellow path.** The
+> GM workflow in panel C1 follows Park et al., *Lancet Digital Health* 2026 (see
+> [`docs/references.md`](docs/references.md)) and is not part of this code. Panel
+> D, the graph convolutional models, is also outside this repository: what ships
+> here produces the WM feature matrices that those models consume.
 
 ## Requirements
 
