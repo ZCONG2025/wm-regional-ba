@@ -65,10 +65,6 @@ Nothing below is redistributed here — you install and license each yourself.
 | FSL | 6.x | [install](https://fsl.fmrib.ox.ac.uk/fsl/docs/#/install/index) | stage 07: `bet`, `flirt` |
 | Python | 3.9+ | [python.org](https://www.python.org/downloads/) or [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/) | the `wmba` package |
 
-**No MATLAB is required.** Earlier versions of this pipeline used MATLAB and
-SurfStat for the icosphere resampling; that step is now a single
-`mri_surf2surf` call, which ships with FreeSurfer.
-
 FreeSurfer only runs on Linux and macOS. On Windows use WSL2 with a Linux
 distribution.
 
